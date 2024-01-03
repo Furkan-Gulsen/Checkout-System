@@ -1,0 +1,7 @@
+Server:
+  Host: localhost
+  Port: 3000
+Mongo:
+  Host: localhost
+  Port: 27017
+  Database: ty_case
