@@ -18,9 +18,9 @@ type DiscountRates struct {
 
 // Promotion struct representing a promotion
 type Promotion struct {
-	ID                string          `json:"id" bson:"_id"`
+	ID                int64           `json:"id" bson:"_id"`
 	DiscountRate      float64         `json:"discountRate" bson:"discountRate"`
-	RelatedCategoryId string          `json:"relatedCategoryId" bson:"relatedCategoryId"`
+	RelatedCategoryId int64           `json:"relatedCategoryId" bson:"relatedCategoryId"`
 	MinCartTotal      float64         `json:"minCartTotal" bson:"minCartTotal"`
 	DiscountRates     []DiscountRates `json:"discountRates" bson:"discountRates"`
 	PromotionType     PromotionType   `json:"promotionType" bson:"promotionType"`
