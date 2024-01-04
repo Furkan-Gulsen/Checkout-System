@@ -7,9 +7,11 @@ import (
 	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/config"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/product"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/item"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/infra/database"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -43,8 +45,11 @@ func main() {
 		})
 	})
 
+	// * Swagger Routes for development
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	// * Setup Product Router
-	product.SetupRouter(router)
+	item.SetupRouter(router, db, cfg.Mongo.Database)
 
 	fmt.Print("Server is running on port: " + cfg.Server.Port + "\n")
 	router.Run(":" + cfg.Server.Port)
