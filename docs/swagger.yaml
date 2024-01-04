@@ -1,0 +1,133 @@
+definitions:
+  entities.Item:
+    properties:
+      categoryId:
+        type: integer
+      id:
+        type: integer
+      price:
+        type: number
+      quantity:
+        maximum: 10
+        type: integer
+      sellerId:
+        type: integer
+      vasItems:
+        items:
+          $ref: '#/definitions/entities.VasItem'
+        type: array
+    required:
+    - categoryId
+    - price
+    - quantity
+    - sellerId
+    type: object
+  entities.VasItem:
+    properties:
+      categoryId:
+        type: integer
+      id:
+        type: integer
+      price:
+        type: number
+      quantity:
+        type: integer
+      sellerId:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /item/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an item by its ID
+      parameters:
+      - description: Item ID
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete an item by ID
+    get:
+      consumes:
+      - application/json
+      description: Get an item by its ID
+      parameters:
+      - description: Item ID
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get an item by ID
+  /item/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new item
+      parameters:
+      - description: Item object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item created successfully
+          schema:
+            type: string
+      summary: Create an item
+  /item/list:
+    get:
+      description: Get a list of items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Item'
+            type: array
+      summary: List items
+swagger: "2.0"
