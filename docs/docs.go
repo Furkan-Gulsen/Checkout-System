@@ -15,7 +15,64 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/item/create": {
+        "/api/v1/category/create": {
+            "post": {
+                "description": "Create a new category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Create a category",
+                "parameters": [
+                    {
+                        "description": "Category object",
+                        "name": "category",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category created successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/category/list": {
+            "get": {
+                "description": "Get a list of categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "List categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Category"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/item/create": {
             "post": {
                 "description": "Create a new item",
                 "consumes": [
@@ -23,6 +80,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Product"
                 ],
                 "summary": "Create an item",
                 "parameters": [
@@ -46,11 +106,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/item/list": {
+        "/api/v1/item/list": {
             "get": {
                 "description": "Get a list of items",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Product"
                 ],
                 "summary": "List items",
                 "responses": {
@@ -66,7 +129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/item/{id}": {
+        "/api/v1/item/{id}": {
             "get": {
                 "description": "Get an item by its ID",
                 "consumes": [
@@ -75,11 +138,14 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Product"
+                ],
                 "summary": "Get an item by ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "format": "int64",
+                        "format": "int",
                         "description": "Item ID",
                         "name": "id",
                         "in": "path",
@@ -117,11 +183,14 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Product"
+                ],
                 "summary": "Delete an item by ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "format": "int64",
+                        "format": "int",
                         "description": "Item ID",
                         "name": "id",
                         "in": "path",
@@ -130,20 +199,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Item deleted successfully",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -154,6 +210,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entities.Category": {
+            "type": "object",
+            "required": [
+                "itemType",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "itemType": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.Item": {
             "type": "object",
             "required": [
@@ -169,38 +247,15 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "itemType": {
+                    "type": "integer"
+                },
                 "price": {
                     "type": "number"
                 },
                 "quantity": {
                     "type": "integer",
                     "maximum": 10
-                },
-                "sellerId": {
-                    "type": "integer"
-                },
-                "vasItems": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entities.VasItem"
-                    }
-                }
-            }
-        },
-        "entities.VasItem": {
-            "type": "object",
-            "properties": {
-                "categoryId": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "quantity": {
-                    "type": "integer"
                 },
                 "sellerId": {
                     "type": "integer"

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/config"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/category"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/item"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/infra/database"
 	"github.com/gin-gonic/gin"
@@ -49,7 +50,9 @@ func main() {
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// * Setup Product Router
-	item.SetupRouter(router, db, cfg.Mongo.Database)
+	apiRouter := router.Group("/api/v1")
+	item.RegisterRoutes(apiRouter, db, cfg.Mongo.Database)
+	category.RegisterRoutes(apiRouter, db, cfg.Mongo.Database)
 
 	fmt.Print("Server is running on port: " + cfg.Server.Port + "\n")
 	router.Run(":" + cfg.Server.Port)
