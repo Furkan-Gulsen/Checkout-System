@@ -14,7 +14,7 @@ import (
 type ItemRepositoryInterface interface {
 	List(ctx context.Context) ([]entities.Item, error)
 	Create(ctx context.Context, item entities.Item) error
-	GetById(ctx context.Context, itemID int64) error
+	GetById(ctx context.Context, itemID int) error
 	Delete(ctx context.Context, itemID string) error
 }
 
@@ -44,7 +44,7 @@ func (r *ItemRepository) List(ctx context.Context) ([]entities.Item, error) {
 }
 
 func (r *ItemRepository) Create(ctx context.Context, item entities.Item) error {
-	item.Id = int64(uuid.New().ID())
+	item.Id = int(uuid.New().ID())
 	_, err := r.collection.InsertOne(ctx, item)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (r *ItemRepository) Create(ctx context.Context, item entities.Item) error {
 	return nil
 }
 
-func (r *ItemRepository) GetById(ctx context.Context, itemID int64) (entities.Item, error) {
+func (r *ItemRepository) GetById(ctx context.Context, itemID int) (entities.Item, error) {
 	var item entities.Item
 
 	err := r.collection.FindOne(ctx, bson.M{"_id": itemID}).Decode(&item)
@@ -64,7 +64,7 @@ func (r *ItemRepository) GetById(ctx context.Context, itemID int64) (entities.It
 	return item, nil
 }
 
-func (r *ItemRepository) Delete(ctx context.Context, itemID int64) error {
+func (r *ItemRepository) Delete(ctx context.Context, itemID int) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": itemID})
 	if err != nil {
 		return err

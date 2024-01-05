@@ -7,13 +7,21 @@ import (
 	"github.com/go-playground/validator"
 )
 
+type ItemType int
+
+const (
+	DigitalItem PromotionType = iota + 1
+	DefaultItem
+)
+
 type Item struct {
-	Id         int64     `json:"id" bson:"_id"`
-	CategoryID int64     `json:"categoryId" bson:"categoryId" validate:"required"`
-	SellerID   int64     `json:"sellerId" bson:"sellerId" validate:"required"`
-	Price      float64   `json:"price" bson:"price" validate:"required"`
-	Quantity   int64     `json:"quantity" bson:"quantity" validate:"required,max=10"`
-	VasItems   []VasItem `json:"vasItems,omitempty" bson:"vasItems,omitempty"`
+	Id         int      `json:"id" bson:"_id"`
+	CategoryID int      `json:"categoryId" bson:"categoryId" validate:"required"`
+	SellerID   int      `json:"sellerId" bson:"sellerId" validate:"required"`
+	Price      float64  `json:"price" bson:"price" validate:"required"`
+	Quantity   int      `json:"quantity" bson:"quantity" validate:"required,max=10"`
+	ItemType   ItemType `json:"itemType,omitempty" bson:"itemType,omitempty"`
+	// VasItems   []VasItem `json:"vasItems,omitempty" bson:"vasItems,omitempty"`
 }
 
 // Validate function validates the Item structure and handles errors.

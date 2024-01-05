@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(g *gin.Engine, db *database.Database, dbName string) {
+func RegisterRoutes(g *gin.RouterGroup, db *database.Database, dbName string) {
 
 	itemRouterGroup := g.Group("/item")
 
@@ -35,9 +35,10 @@ func NewItemRouter(itemService ItemService) *ItemRouter {
 
 // @Summary List items
 // @Description Get a list of items
+// @Tags Product
 // @Produce json
 // @Success 200 {object} []entities.Item
-// @Router /item/list [get]
+// @Router /api/v1/item/list [get]
 func (r *ItemRouter) list(c *gin.Context) {
 	items, err := r.ItemService.List()
 	if err != nil {
@@ -53,11 +54,12 @@ func (r *ItemRouter) list(c *gin.Context) {
 
 // @Summary Create an item
 // @Description Create a new item
+// @Tags Product
 // @Accept json
 // @Produce json
 // @Param item body entities.Item true "Item object"
 // @Success 200 {string} string "Item created successfully"
-// @Router /item/create [post]
+// @Router /api/v1/item/create [post]
 func (r *ItemRouter) create(c *gin.Context) {
 	var item entities.Item
 
@@ -86,13 +88,14 @@ func (r *ItemRouter) create(c *gin.Context) {
 
 // @Summary Get an item by ID
 // @Description Get an item by its ID
+// @Tags Product
 // @Accept json
 // @Produce json
-// @Param id path int true "Item ID" Format(int64)
+// @Param id path int true "Item ID" Format(int)
 // @Success 200 {object} string
 // @Failure 400 {object} map[string]interface{} "Bad Request"
 // @Failure 500 {object} map[string]interface{} "Internal Server Error"
-// @Router /item/{id} [get]
+// @Router /api/v1/item/{id} [get]
 func (h *ItemRouter) getById(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 	if paramID == "" {
@@ -100,7 +103,7 @@ func (h *ItemRouter) getById(ctx *gin.Context) {
 		return
 	}
 
-	id, err := strconv.ParseInt(paramID, 10, 64)
+	id, err := strconv.Atoi(paramID)
 	if err != nil {
 		ctx.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
 		return
@@ -117,13 +120,12 @@ func (h *ItemRouter) getById(ctx *gin.Context) {
 
 // @Summary Delete an item by ID
 // @Description Delete an item by its ID
+// @Tags Product
 // @Accept json
 // @Produce json
-// @Param id path int true "Item ID" Format(int64)
-// @Success 200 {string} string "Item deleted successfully"
-// @Failure 400 {object} map[string]interface{} "Bad Request"
-// @Failure 500 {object} map[string]interface{} "Internal Server Error"
-// @Router /item/{id} [delete]
+// @Param id path int true "Item ID" Format(int)
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/item/{id} [delete]
 func (h *ItemRouter) delete(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 	if paramID == "" {
@@ -131,7 +133,7 @@ func (h *ItemRouter) delete(ctx *gin.Context) {
 		return
 	}
 
-	id, err := strconv.ParseInt(paramID, 10, 64)
+	id, err := strconv.Atoi(paramID)
 	if err != nil {
 		ctx.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
 		return
