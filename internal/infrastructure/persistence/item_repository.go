@@ -26,19 +26,20 @@ func NewItemRepository(d *database.Database, dbName string) *ItemRepository {
 // ItemRepository implements repository.ItemRepositoryI interface
 var _ repository.ItemRepositoryI = &ItemRepository{}
 
-func (r *ItemRepository) List() ([]*entity.Item, error) {
+func (r *ItemRepository) ListByCartId(cartId int) ([]*entity.Item, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	var items []*entity.Item
 
-	cursor, err := r.collection.Find(ctx, bson.M{})
+	cursor, err := r.collection.Find(ctx, bson.M{"cartId": cartId})
 	if err != nil {
-		return nil, err
+		return items, err
 	}
 
-	if err := cursor.All(ctx, &items); err != nil {
-		return nil, err
+	err = cursor.All(ctx, &items)
+	if err != nil {
+		return items, err
 	}
 
 	return items, nil

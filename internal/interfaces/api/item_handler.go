@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
 
 	_ "github.com/Furkan-Gulsen/Checkout-System/docs"
@@ -23,12 +24,33 @@ func NewItemHandler(itemApp application.ItemAppInterface) *ItemHandler {
 // @Description Get a list of items
 // @Tags Item
 // @Produce json
+// @Param cart_id query int true "Cart ID" Format(int)
 // @Success 200 {object} []entity.Item
 // @Router /api/v1/item/list [get]
-func (h *ItemHandler) List(c *gin.Context) {
-	items, err := h.itemApp.List()
+func (h *ItemHandler) ListByCartId(c *gin.Context) {
+	query := c.Request.URL.Query()
+	queryCartId := query.Get("cart_id")
+	fmt.Println("queryCartId: ", queryCartId)
+
+	if queryCartId == "" {
+		c.JSON(400, gin.H{"status": false, "message": "Cart ID is required"})
+		return
+	}
+
+	cartId, err := strconv.Atoi(queryCartId)
+	if err != nil {
+		c.JSON(400, gin.H{"status": false, "message": "Invalid Cart ID format"})
+		return
+	}
+
+	items, err := h.itemApp.ListByCartId(cartId)
 	if err != nil {
 		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		return
+	}
+
+	if len(items) == 0 {
+		c.JSON(200, gin.H{"status": false, "message": "No items found"})
 		return
 	}
 

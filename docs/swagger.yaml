@@ -76,16 +76,16 @@ definitions:
     enum:
     - 1
     - 2
+    - 3
     - 1
     - 2
-    - 3
     type: integer
     x-enum-varnames:
-    - DigitalItem
-    - DefaultItem
     - SameSellerPromotion
     - CategoryPromotion
     - TotalPricePromotion
+    - DigitalItem
+    - DefaultItem
   entity.SameSellerPromotionDiscount:
     properties:
       discountRate:
@@ -246,6 +246,13 @@ paths:
   /api/v1/item/list:
     get:
       description: Get a list of items
+      parameters:
+      - description: Cart ID
+        format: int
+        in: query
+        name: cart_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

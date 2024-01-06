@@ -14,7 +14,7 @@ type itemApp struct {
 }
 
 type ItemAppInterface interface {
-	List() ([]*entity.Item, error)
+	ListByCartId(int) ([]*entity.Item, error)
 	Create(*entity.Item) error
 	GetById(int) (*entity.Item, error)
 	Delete(int) error
@@ -27,8 +27,8 @@ func NewItemApp(itemRepo repository.ItemRepositoryI, categoryRepo repository.Cat
 	}
 }
 
-func (app *itemApp) List() ([]*entity.Item, error) {
-	return app.itemRepo.List()
+func (app *itemApp) ListByCartId(cartId int) ([]*entity.Item, error) {
+	return app.itemRepo.ListByCartId(cartId)
 }
 
 func (app *itemApp) Create(item *entity.Item) error {

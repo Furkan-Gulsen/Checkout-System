@@ -34,7 +34,7 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 
 	// * Item Routes
 	itemRouterGroup := g.Group("/item")
-	itemRouterGroup.GET("/list", itemHandler.List)
+	itemRouterGroup.GET("/list", itemHandler.ListByCartId)
 	itemRouterGroup.POST("/create", itemHandler.Create)
 	itemRouterGroup.GET("/:id", itemHandler.GetById)
 	itemRouterGroup.DELETE("/:id", itemHandler.Delete)

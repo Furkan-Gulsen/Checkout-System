@@ -5,7 +5,7 @@ import (
 )
 
 type ItemRepositoryI interface {
-	List() ([]*entity.Item, error)
+	ListByCartId(cartId int) ([]*entity.Item, error)
 	Create(item *entity.Item) error
 	GetById(itemID int) (*entity.Item, error)
 	Delete(itemID int) error

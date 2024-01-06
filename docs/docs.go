@@ -145,6 +145,16 @@ const docTemplate = `{
                     "Item"
                 ],
                 "summary": "List items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Cart ID",
+                        "name": "cart_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -438,16 +448,16 @@ const docTemplate = `{
             "enum": [
                 1,
                 2,
+                3,
                 1,
-                2,
-                3
+                2
             ],
             "x-enum-varnames": [
-                "DigitalItem",
-                "DefaultItem",
                 "SameSellerPromotion",
                 "CategoryPromotion",
-                "TotalPricePromotion"
+                "TotalPricePromotion",
+                "DigitalItem",
+                "DefaultItem"
             ]
         },
         "entity.SameSellerPromotionDiscount": {
