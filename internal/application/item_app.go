@@ -9,8 +9,8 @@ import (
 )
 
 type itemApp struct {
-	itemRepo     repository.ItemRepositoryI
-	categoryRepo repository.CategoryRepositoryI
+	itemRepo    repository.ItemRepositoryI
+	categoryApp CategoryAppInterface
 }
 
 type ItemAppInterface interface {
@@ -20,10 +20,10 @@ type ItemAppInterface interface {
 	Delete(int) error
 }
 
-func NewItemApp(itemRepo repository.ItemRepositoryI, categoryRepo repository.CategoryRepositoryI) *itemApp {
+func NewItemApp(itemRepo repository.ItemRepositoryI, categoryApp CategoryAppInterface) *itemApp {
 	return &itemApp{
-		itemRepo:     itemRepo,
-		categoryRepo: categoryRepo,
+		itemRepo:    itemRepo,
+		categoryApp: categoryApp,
 	}
 }
 
@@ -32,7 +32,7 @@ func (app *itemApp) ListByCartId(cartId int) ([]*entity.Item, error) {
 }
 
 func (app *itemApp) Create(item *entity.Item) error {
-	category, err := app.categoryRepo.GetByID(item.CategoryID)
+	category, err := app.categoryApp.GetByID(item.CategoryID)
 	if err != nil {
 		slog.Error("Item category not found. Error: ", err)
 		return fmt.Errorf("item category not found. CategoryID: %d", item.CategoryID)

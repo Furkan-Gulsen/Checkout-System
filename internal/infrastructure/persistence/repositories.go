@@ -15,6 +15,7 @@ type Repositories struct {
 	Category  repository.CategoryRepositoryI
 	Promotion repository.PromotionRepositoryI
 	VasItem   repository.VasItemRepositoryI
+	Cart      repository.CartRepositoryI
 	db        *database.Database
 }
 
@@ -33,6 +34,7 @@ func NewRepositories(cfg config.MongoDBConfig) (*Repositories, error) {
 		Category:  NewCategoryRepository(db, cfg.Database),
 		Promotion: NewPromotionRepository(db, cfg.Database),
 		VasItem:   NewVasItemRepository(db, cfg.Database),
+		Cart:      NewCartRepository(db, cfg.Database),
 		db:        db,
 	}, nil
 }

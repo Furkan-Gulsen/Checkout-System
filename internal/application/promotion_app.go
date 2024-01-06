@@ -5,14 +5,14 @@ import (
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 )
 
+type promotionApp struct {
+	promotionRepo repository.PromotionRepositoryI
+}
+
 type PromotionAppInterface interface {
 	List() ([]*entity.Promotion, error)
 	Create(*entity.Promotion) error
 	GetById(int) (*entity.Promotion, error)
-}
-
-type promotionApp struct {
-	promotionRepo repository.PromotionRepositoryI
 }
 
 func NewPromotionApp(promotionRepo repository.PromotionRepositoryI) *promotionApp {

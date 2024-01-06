@@ -71,3 +71,15 @@ func (r *VasItemRepository) Create(vasItem *entity.VasItem) error {
 
 	return nil
 }
+
+func (r *VasItemRepository) DeleteById(vasItemId int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": vasItemId})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -76,16 +76,16 @@ definitions:
     enum:
     - 1
     - 2
+    - 3
     - 1
     - 2
-    - 3
     type: integer
     x-enum-varnames:
-    - DigitalItem
-    - DefaultItem
     - SameSellerPromotion
     - CategoryPromotion
     - TotalPricePromotion
+    - DigitalItem
+    - DefaultItem
   entity.SameSellerPromotionDiscount:
     properties:
       discountRate:
@@ -134,6 +134,73 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/v1/cart/{cartId}:
+    delete:
+      consumes:
+      - application/json
+      description: Reset a cart
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cartId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cart reset successfully
+          schema:
+            type: string
+      summary: Reset cart
+      tags:
+      - Cart
+    get:
+      consumes:
+      - application/json
+      description: Display a cart
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cartId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cart displayed successfully
+          schema:
+            type: string
+      summary: Display cart
+      tags:
+      - Cart
+  /api/v1/cart/{cartId}/promotion/{promotionId}:
+    post:
+      consumes:
+      - application/json
+      description: Apply a promotion to a cart
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cartId
+        required: true
+        type: integer
+      - description: Promotion ID
+        in: path
+        name: promotionId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Promotion applied successfully
+          schema:
+            type: string
+      summary: Apply promotion
+      tags:
+      - Cart
   /api/v1/category:
     post:
       consumes:
@@ -367,6 +434,25 @@ paths:
       tags:
       - VasItem
   /api/v1/vasitem/{id}:
+    delete:
+      description: Delete a vas item
+      parameters:
+      - description: Vas Item ID
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vas Item deleted successfully
+          schema:
+            type: string
+      summary: Delete a vas item
+      tags:
+      - VasItem
     get:
       description: Get a vas item
       parameters:

@@ -6,4 +6,5 @@ type VasItemRepositoryI interface {
 	ListByItemId(int) ([]*entity.VasItem, error)
 	GetById(int) (*entity.VasItem, error)
 	Create(*entity.VasItem) error
+	DeleteById(int) error
 }
