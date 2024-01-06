@@ -1,16 +1,15 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/config"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/category"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/item"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/infra/database"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/persistence"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -24,20 +23,15 @@ func main() {
 
 	fmt.Print("Config is loaded: ", cfg)
 
-	// * Setup Database
-	ctxDBTimeout, cancel := context.WithTimeout(context.Background(), time.Second*60) // * 1 minute timeout for database connection
-	mongodbURI := "mongodb://" + cfg.Mongo.Host + ":" + cfg.Mongo.Port
-	db, err := database.Connect(ctxDBTimeout, mongodbURI)
-	if err != nil {
-		slog.Error("Failed to setup database: %v", err)
-	}
-	defer db.Disconnect()
-	defer cancel()
-
 	// * Setup Server
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+
+	// * Setup Prometheus
+	promLogger := logger.NewPrometheusLogger()
+	router.Use(logger.PrometheusMiddleware(promLogger))
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	// * Health Check
 	router.GET("/health", func(c *gin.Context) {
@@ -49,10 +43,15 @@ func main() {
 	// * Swagger Routes for development
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// * Setup Product Router
+	// * Setup Router
 	apiRouter := router.Group("/api/v1")
-	item.RegisterRoutes(apiRouter, db, cfg.Mongo.Database)
-	category.RegisterRoutes(apiRouter, db, cfg.Mongo.Database)
+	repositories, err := persistence.NewRepositories(cfg.Mongo)
+	if err != nil {
+		slog.Error("Failed to create repositories: %v", err)
+	}
+	defer repositories.Close()
+
+	interfaces.RegisterRoutes(apiRouter, repositories)
 
 	fmt.Print("Server is running on port: " + cfg.Server.Port + "\n")
 	router.Run(":" + cfg.Server.Port)
