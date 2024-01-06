@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Category"
+                            "$ref": "#/definitions/entity.Category"
                         }
                     }
                 ],
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.Category"
+                                "$ref": "#/definitions/entity.Category"
                             }
                         }
                     }
@@ -82,7 +82,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "Create an item",
                 "parameters": [
@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Item"
+                            "$ref": "#/definitions/entity.Item"
                         }
                     }
                 ],
@@ -113,7 +113,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "List items",
                 "responses": {
@@ -122,7 +122,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.Item"
+                                "$ref": "#/definitions/entity.Item"
                             }
                         }
                     }
@@ -139,7 +139,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "Get an item by ID",
                 "parameters": [
@@ -184,7 +184,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "Delete an item by ID",
                 "parameters": [
@@ -210,7 +210,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entities.Category": {
+        "entity.Category": {
             "type": "object",
             "required": [
                 "itemType",
@@ -232,7 +232,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.Item": {
+        "entity.Item": {
             "type": "object",
             "required": [
                 "categoryId",

@@ -24,7 +24,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Category"
+                            "$ref": "#/definitions/entity.Category"
                         }
                     }
                 ],
@@ -54,7 +54,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.Category"
+                                "$ref": "#/definitions/entity.Category"
                             }
                         }
                     }
@@ -71,7 +71,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "Create an item",
                 "parameters": [
@@ -81,7 +81,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.Item"
+                            "$ref": "#/definitions/entity.Item"
                         }
                     }
                 ],
@@ -102,7 +102,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "List items",
                 "responses": {
@@ -111,7 +111,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.Item"
+                                "$ref": "#/definitions/entity.Item"
                             }
                         }
                     }
@@ -128,7 +128,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "Get an item by ID",
                 "parameters": [
@@ -173,7 +173,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Item"
                 ],
                 "summary": "Delete an item by ID",
                 "parameters": [
@@ -199,7 +199,7 @@
         }
     },
     "definitions": {
-        "entities.Category": {
+        "entity.Category": {
             "type": "object",
             "required": [
                 "itemType",
@@ -221,7 +221,7 @@
                 }
             }
         },
-        "entities.Item": {
+        "entity.Item": {
             "type": "object",
             "required": [
                 "categoryId",
