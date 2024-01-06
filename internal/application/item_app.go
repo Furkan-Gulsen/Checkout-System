@@ -8,8 +8,6 @@ import (
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 )
 
-var _ ItemAppInterface = &itemApp{}
-
 type itemApp struct {
 	itemRepo     repository.ItemRepositoryI
 	categoryRepo repository.CategoryRepositoryI

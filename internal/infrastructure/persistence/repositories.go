@@ -11,9 +11,10 @@ import (
 )
 
 type Repositories struct {
-	Item     repository.ItemRepositoryI
-	Category repository.CategoryRepositoryI
-	db       *database.Database
+	Item      repository.ItemRepositoryI
+	Category  repository.CategoryRepositoryI
+	Promotion repository.PromotionRepositoryI
+	db        *database.Database
 }
 
 func NewRepositories(cfg config.MongoDBConfig) (*Repositories, error) {
@@ -27,9 +28,10 @@ func NewRepositories(cfg config.MongoDBConfig) (*Repositories, error) {
 	defer cancel()
 
 	return &Repositories{
-		Item:     NewItemRepository(db, cfg.Database),
-		Category: NewCategoryRepository(db, cfg.Database),
-		db:       db,
+		Item:      NewItemRepository(db, cfg.Database),
+		Category:  NewCategoryRepository(db, cfg.Database),
+		Promotion: NewPromotionRepository(db, cfg.Database),
+		db:        db,
 	}, nil
 }
 

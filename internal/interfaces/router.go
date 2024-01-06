@@ -19,10 +19,12 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	// * Application Layer
 	itemApp := application.NewItemApp(repositories.Item, repositories.Category)
 	categoryApp := application.NewCategoryApp(repositories.Category)
+	promotionApp := application.NewPromotionApp(repositories.Promotion)
 
 	// * Handlers
 	itemHandler := api.NewItemHandler(itemApp)
 	categoryHandler := api.NewCategoryHandler(categoryApp)
+	promotionHandler := api.NewPromotionHandler(promotionApp)
 
 	// * Category Routes
 	categoryRouterGroup := g.Group("/category")
@@ -37,4 +39,9 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	itemRouterGroup.GET("/:id", itemHandler.GetById)
 	itemRouterGroup.DELETE("/:id", itemHandler.Delete)
 
+	// * Promotion Routes
+	promotionRouterGroup := g.Group("/promotion")
+	promotionRouterGroup.GET("/list", promotionHandler.List)
+	promotionRouterGroup.POST("/create", promotionHandler.Create)
+	promotionRouterGroup.GET("/:id", promotionHandler.GetById)
 }

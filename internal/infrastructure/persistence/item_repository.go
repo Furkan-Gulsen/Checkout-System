@@ -8,7 +8,7 @@ import (
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/database"
-	"github.com/google/uuid"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -48,7 +48,8 @@ func (r *ItemRepository) Create(item *entity.Item) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	item.Id = int(uuid.New().ID())
+	item.Id = utils.GenerateID()
+
 	_, err := r.collection.InsertOne(ctx, item)
 	if err != nil {
 		return err

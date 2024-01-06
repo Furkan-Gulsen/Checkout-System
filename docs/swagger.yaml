@@ -14,8 +14,22 @@ definitions:
     - itemType
     - name
     type: object
+  entity.CategoryPromotionDiscount:
+    properties:
+      categoryID:
+        type: integer
+      discountRate:
+        maximum: 100
+        minimum: 0
+        type: number
+    required:
+    - categoryID
+    - discountRate
+    type: object
   entity.Item:
     properties:
+      cartId:
+        type: integer
       categoryId:
         type: integer
       id:
@@ -30,10 +44,69 @@ definitions:
       sellerId:
         type: integer
     required:
+    - cartId
     - categoryId
     - price
     - quantity
     - sellerId
+    type: object
+  entity.Promotion:
+    properties:
+      categoryPromotion:
+        $ref: '#/definitions/entity.CategoryPromotionDiscount'
+      id:
+        type: integer
+      promotionType:
+        allOf:
+        - $ref: '#/definitions/entity.PromotionType'
+        enum:
+        - 1
+        - 2
+        - 3
+      sameSellerPromotion:
+        $ref: '#/definitions/entity.SameSellerPromotionDiscount'
+      totalPricePromotions:
+        items:
+          $ref: '#/definitions/entity.TotalPricePromotionDiscount'
+        type: array
+    required:
+    - promotionType
+    type: object
+  entity.PromotionType:
+    enum:
+    - 1
+    - 2
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - DigitalItem
+    - DefaultItem
+    - SameSellerPromotion
+    - CategoryPromotion
+    - TotalPricePromotion
+  entity.SameSellerPromotionDiscount:
+    properties:
+      discountRate:
+        maximum: 100
+        minimum: 0
+        type: number
+    required:
+    - discountRate
+    type: object
+  entity.TotalPricePromotionDiscount:
+    properties:
+      discountAmount:
+        type: number
+      priceRangeEnd:
+        type: number
+      priceRangeStart:
+        type: number
+    required:
+    - discountAmount
+    - priceRangeEnd
+    - priceRangeStart
     type: object
 info:
   contact: {}
@@ -185,4 +258,60 @@ paths:
       summary: List items
       tags:
       - Item
+  /api/v1/promotion/{id}:
+    get:
+      description: Get a promotion by its ID
+      parameters:
+      - description: Promotion ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get a promotion by ID
+      tags:
+      - Promotion
+  /api/v1/promotion/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new promotion
+      parameters:
+      - description: Promotion object
+        in: body
+        name: promotion
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Promotion'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Promotion created successfully
+          schema:
+            type: string
+      summary: Create a promotion
+      tags:
+      - Promotion
+  /api/v1/promotion/list:
+    get:
+      description: Get a list of promotions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Promotion'
+            type: array
+      summary: List promotions
+      tags:
+      - Promotion
 swagger: "2.0"

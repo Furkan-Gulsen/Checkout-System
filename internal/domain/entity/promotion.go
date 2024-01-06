@@ -1,9 +1,7 @@
 package entity
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/go-playground/validator"
 )
@@ -11,64 +9,91 @@ import (
 type PromotionType int
 
 const (
-	SameSellerPromotion PromotionType = iota
+	SameSellerPromotion PromotionType = iota + 1
 	CategoryPromotion
 	TotalPricePromotion
 )
 
-type TotalPricePromotionDiscount struct {
-	PriceRangeStart float64
-	PriceRangeEnd   float64
-	DiscountAmount  float64
-}
-
 type SameSellerPromotionDiscount struct {
-	DiscountRate float64
+	DiscountRate float64 `json:"discountRate" bson:"discountRate" validate:"required,min=0,max=100"`
 }
 
 type CategoryPromotionDiscount struct {
-	DiscountRate float64
-	CategoryID   int
+	DiscountRate float64 `json:"discountRate" bson:"discountRate" validate:"required,min=0,max=100"`
+	CategoryID   int     `json:"categoryID" bson:"categoryID" validate:"required"`
+}
+
+type TotalPricePromotionDiscount struct {
+	PriceRangeStart float64 `json:"priceRangeStart" bson:"priceRangeStart" validate:"required"`
+	PriceRangeEnd   float64 `json:"priceRangeEnd" bson:"priceRangeEnd" validate:"required"`
+	DiscountAmount  float64 `json:"discountAmount" bson:"discountAmount" validate:"required"`
 }
 
 type Promotion struct {
-	ID            int           `json:"id" bson:"_id"`
-	PromotionType PromotionType `json:"promotionType" bson:"promotionType" validate:"required"`
-	Discount      interface{}   `json:"discount" bson:"discount" validate:"dive,required"`
+	Id            int                            `json:"id" bson:"_id"`
+	PromotionType PromotionType                  `json:"promotionType" bson:"promotionType" validate:"required,oneof=1 2 3"`
+	SameSellerP   *SameSellerPromotionDiscount   `json:"sameSellerPromotion,omitempty" bson:"sameSellerPromotion,omitempty"`
+	CategoryP     *CategoryPromotionDiscount     `json:"categoryPromotion,omitempty" bson:"categoryPromotion,omitempty"`
+	TotalPriceP   []*TotalPricePromotionDiscount `json:"totalPricePromotions,omitempty" bson:"totalPricePromotions,omitempty"`
 }
 
 func (p *Promotion) Validate() error {
+	// * Check if only one of sameSellerP, categoryP or totalPriceP exists
+	if (p.SameSellerP != nil && p.CategoryP != nil) ||
+		(p.SameSellerP != nil && p.TotalPriceP != nil) ||
+		(p.CategoryP != nil && p.TotalPriceP != nil) {
+		return fmt.Errorf("only one of sameSellerP, categoryP, or totalPriceP can be set")
+	}
+
+	// * Check if promotion type is valid
 	validate := validator.New()
-	if err := validate.Struct(p); err != nil {
-		var customValidationErrors []string
-		for _, err := range err.(validator.ValidationErrors) {
-			if err.Tag() == "required" {
-				customValidationErrors = append(customValidationErrors, fmt.Sprintf("%s is required.", err.StructField()))
+	switch p.PromotionType {
+	case SameSellerPromotion:
+		if p.SameSellerP == nil {
+			return fmt.Errorf("sameSellerP is required")
+		}
+		if err := validate.Struct(p.SameSellerP); err != nil {
+			return translateValidationErrors(err)
+		}
+
+	case CategoryPromotion:
+		if p.CategoryP == nil {
+			return fmt.Errorf("categoryP is required")
+		}
+		if err := validate.Struct(p.CategoryP); err != nil {
+			return translateValidationErrors(err)
+		}
+
+	case TotalPricePromotion:
+		if p.TotalPriceP == nil {
+			return fmt.Errorf("totalPriceP is required")
+		} else if len(p.TotalPriceP) == 0 {
+			return fmt.Errorf("totalPriceP must have at least one element")
+		}
+
+		for _, totalPriceP := range p.TotalPriceP {
+			if err := validate.Struct(totalPriceP); err != nil {
+				return translateValidationErrors(err)
 			}
 		}
 
-		if len(customValidationErrors) > 0 {
-			return errors.New("Validation errors: " + strings.Join(customValidationErrors, " "))
-		}
-	}
-
-	switch p.PromotionType {
-	case SameSellerPromotion:
-		_, ok := p.Discount.(SameSellerPromotionDiscount)
-		if !ok {
-			return errors.New("discount is not SameSellerPromotionDiscount")
-		}
-	case CategoryPromotion:
-		_, ok := p.Discount.(CategoryPromotionDiscount)
-		if !ok {
-			return errors.New("discount is not CategoryPromotionDiscount")
-		}
-	case TotalPricePromotion:
-		_, ok := p.Discount.(TotalPricePromotionDiscount)
-		if !ok {
-			return errors.New("discount is not TotalPricePromotionDiscount")
-		}
+	default:
+		return fmt.Errorf("invalid promotion type")
 	}
 
 	return nil
+}
+
+func translateValidationErrors(err error) error {
+	for _, validationErr := range err.(validator.ValidationErrors) {
+		switch validationErr.Tag() {
+		case "required":
+			return fmt.Errorf("%s is required", validationErr.StructField())
+		case "min":
+			return fmt.Errorf("%s must be greater than or equal to 0", validationErr.StructField())
+		case "max":
+			return fmt.Errorf("%s must be less than or equal to 100", validationErr.StructField())
+		}
+	}
+	return err
 }

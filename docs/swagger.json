@@ -225,6 +225,92 @@
                     }
                 }
             }
+        },
+        "/api/v1/promotion/create": {
+            "post": {
+                "description": "Create a new promotion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "Create a promotion",
+                "parameters": [
+                    {
+                        "description": "Promotion object",
+                        "name": "promotion",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Promotion"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Promotion created successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/promotion/list": {
+            "get": {
+                "description": "Get a list of promotions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "List promotions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Promotion"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/promotion/{id}": {
+            "get": {
+                "description": "Get a promotion by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "Get a promotion by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Promotion ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -250,15 +336,36 @@
                 }
             }
         },
+        "entity.CategoryPromotionDiscount": {
+            "type": "object",
+            "required": [
+                "categoryID",
+                "discountRate"
+            ],
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "discountRate": {
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                }
+            }
+        },
         "entity.Item": {
             "type": "object",
             "required": [
+                "cartId",
                 "categoryId",
                 "price",
                 "quantity",
                 "sellerId"
             ],
             "properties": {
+                "cartId": {
+                    "type": "integer"
+                },
                 "categoryId": {
                     "type": "integer"
                 },
@@ -277,6 +384,90 @@
                 },
                 "sellerId": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.Promotion": {
+            "type": "object",
+            "required": [
+                "promotionType"
+            ],
+            "properties": {
+                "categoryPromotion": {
+                    "$ref": "#/definitions/entity.CategoryPromotionDiscount"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "promotionType": {
+                    "enum": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.PromotionType"
+                        }
+                    ]
+                },
+                "sameSellerPromotion": {
+                    "$ref": "#/definitions/entity.SameSellerPromotionDiscount"
+                },
+                "totalPricePromotions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.TotalPricePromotionDiscount"
+                    }
+                }
+            }
+        },
+        "entity.PromotionType": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "DigitalItem",
+                "DefaultItem",
+                "SameSellerPromotion",
+                "CategoryPromotion",
+                "TotalPricePromotion"
+            ]
+        },
+        "entity.SameSellerPromotionDiscount": {
+            "type": "object",
+            "required": [
+                "discountRate"
+            ],
+            "properties": {
+                "discountRate": {
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                }
+            }
+        },
+        "entity.TotalPricePromotionDiscount": {
+            "type": "object",
+            "required": [
+                "discountAmount",
+                "priceRangeEnd",
+                "priceRangeStart"
+            ],
+            "properties": {
+                "discountAmount": {
+                    "type": "number"
+                },
+                "priceRangeEnd": {
+                    "type": "number"
+                },
+                "priceRangeStart": {
+                    "type": "number"
                 }
             }
         }

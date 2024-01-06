@@ -7,7 +7,7 @@ import (
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/database"
-	"github.com/google/uuid"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -47,7 +47,7 @@ func (r *CategoryRepository) Create(category entity.Category) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	category.Id = int(uuid.New().ID())
+	category.Id = utils.GenerateID()
 
 	_, err := r.collection.InsertOne(ctx, category)
 	if err != nil {
