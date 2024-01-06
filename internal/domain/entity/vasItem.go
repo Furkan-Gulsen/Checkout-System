@@ -9,7 +9,7 @@ import (
 )
 
 type VasItem struct {
-	ID         int     `json:"id" bson:"_id"`
+	Id         int     `json:"id" bson:"_id"`
 	ItemId     int     `json:"itemId" bson:"itemId" validate:"required"`
 	CategoryId int     `json:"categoryId" bson:"categoryId" validate:"required"`
 	SellerId   int     `json:"sellerId" bson:"sellerId" validate:"required"`

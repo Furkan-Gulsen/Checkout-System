@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/category/create": {
+        "/api/v1/category": {
             "post": {
                 "description": "Create a new category",
                 "consumes": [
@@ -101,7 +101,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/item/create": {
+        "/api/v1/item": {
             "post": {
                 "description": "Create a new item",
                 "consumes": [
@@ -247,7 +247,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/promotion/create": {
+        "/api/v1/promotion": {
             "post": {
                 "description": "Create a new promotion",
                 "consumes": [
@@ -328,6 +328,106 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/vasitem": {
+            "post": {
+                "description": "Create a new vas item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VasItem"
+                ],
+                "summary": "Create a vas item",
+                "parameters": [
+                    {
+                        "description": "Vas Item object",
+                        "name": "vas_item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.VasItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vas Item created successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/vasitem/list": {
+            "get": {
+                "description": "Get a list of vas items",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VasItem"
+                ],
+                "summary": "List vas items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Item ID",
+                        "name": "item_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.VasItem"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/vasitem/{id}": {
+            "get": {
+                "description": "Get a vas item",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VasItem"
+                ],
+                "summary": "Get vas item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Vas Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.VasItem"
+                            }
                         }
                     }
                 }
@@ -448,16 +548,16 @@ const docTemplate = `{
             "enum": [
                 1,
                 2,
-                3,
                 1,
-                2
+                2,
+                3
             ],
             "x-enum-varnames": [
+                "DigitalItem",
+                "DefaultItem",
                 "SameSellerPromotion",
                 "CategoryPromotion",
-                "TotalPricePromotion",
-                "DigitalItem",
-                "DefaultItem"
+                "TotalPricePromotion"
             ]
         },
         "entity.SameSellerPromotionDiscount": {
@@ -489,6 +589,38 @@ const docTemplate = `{
                 },
                 "priceRangeStart": {
                     "type": "number"
+                }
+            }
+        },
+        "entity.VasItem": {
+            "type": "object",
+            "required": [
+                "categoryId",
+                "itemId",
+                "price",
+                "quantity",
+                "sellerId"
+            ],
+            "properties": {
+                "categoryId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "itemId": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "maximum": 3,
+                    "minimum": 1
+                },
+                "sellerId": {
+                    "type": "integer"
                 }
             }
         }

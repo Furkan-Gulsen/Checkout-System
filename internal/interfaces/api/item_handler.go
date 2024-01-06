@@ -67,7 +67,7 @@ func (h *ItemHandler) ListByCartId(c *gin.Context) {
 // @Produce json
 // @Param item body entity.Item true "Item object"
 // @Success 200 {string} string "Item created successfully"
-// @Router /api/v1/item/create [post]
+// @Router /api/v1/item [post]
 func (h *ItemHandler) Create(c *gin.Context) {
 	var item entity.Item
 

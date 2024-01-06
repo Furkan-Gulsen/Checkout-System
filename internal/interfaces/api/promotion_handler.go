@@ -44,7 +44,7 @@ func (h *PromotionHandler) List(c *gin.Context) {
 // @Produce json
 // @Param promotion body entity.Promotion true "Promotion object"
 // @Success 200 {string} string "Promotion created successfully"
-// @Router /api/v1/promotion/create [post]
+// @Router /api/v1/promotion [post]
 func (h *PromotionHandler) Create(c *gin.Context) {
 	var promotion entity.Promotion
 

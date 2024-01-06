@@ -76,16 +76,16 @@ definitions:
     enum:
     - 1
     - 2
-    - 3
     - 1
     - 2
+    - 3
     type: integer
     x-enum-varnames:
+    - DigitalItem
+    - DefaultItem
     - SameSellerPromotion
     - CategoryPromotion
     - TotalPricePromotion
-    - DigitalItem
-    - DefaultItem
   entity.SameSellerPromotionDiscount:
     properties:
       discountRate:
@@ -108,29 +108,33 @@ definitions:
     - priceRangeEnd
     - priceRangeStart
     type: object
+  entity.VasItem:
+    properties:
+      categoryId:
+        type: integer
+      id:
+        type: integer
+      itemId:
+        type: integer
+      price:
+        type: number
+      quantity:
+        maximum: 3
+        minimum: 1
+        type: integer
+      sellerId:
+        type: integer
+    required:
+    - categoryId
+    - itemId
+    - price
+    - quantity
+    - sellerId
+    type: object
 info:
   contact: {}
 paths:
-  /api/v1/category/{id}:
-    get:
-      description: Get a category by ID
-      parameters:
-      - description: Category ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Get a category by ID
-      tags:
-      - Category
-  /api/v1/category/create:
+  /api/v1/category:
     post:
       consumes:
       - application/json
@@ -152,6 +156,25 @@ paths:
       summary: Create a category
       tags:
       - Category
+  /api/v1/category/{id}:
+    get:
+      description: Get a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get a category by ID
+      tags:
+      - Category
   /api/v1/category/list:
     get:
       description: Get a list of categories
@@ -167,6 +190,28 @@ paths:
       summary: List categories
       tags:
       - Category
+  /api/v1/item:
+    post:
+      consumes:
+      - application/json
+      description: Create a new item
+      parameters:
+      - description: Item object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item created successfully
+          schema:
+            type: string
+      summary: Create an item
+      tags:
+      - Item
   /api/v1/item/{id}:
     delete:
       consumes:
@@ -221,28 +266,6 @@ paths:
       summary: Get an item by ID
       tags:
       - Item
-  /api/v1/item/create:
-    post:
-      consumes:
-      - application/json
-      description: Create a new item
-      parameters:
-      - description: Item object
-        in: body
-        name: item
-        required: true
-        schema:
-          $ref: '#/definitions/entity.Item'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Item created successfully
-          schema:
-            type: string
-      summary: Create an item
-      tags:
-      - Item
   /api/v1/item/list:
     get:
       description: Get a list of items
@@ -265,26 +288,7 @@ paths:
       summary: List items
       tags:
       - Item
-  /api/v1/promotion/{id}:
-    get:
-      description: Get a promotion by its ID
-      parameters:
-      - description: Promotion ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Get a promotion by ID
-      tags:
-      - Promotion
-  /api/v1/promotion/create:
+  /api/v1/promotion:
     post:
       consumes:
       - application/json
@@ -306,6 +310,25 @@ paths:
       summary: Create a promotion
       tags:
       - Promotion
+  /api/v1/promotion/{id}:
+    get:
+      description: Get a promotion by its ID
+      parameters:
+      - description: Promotion ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get a promotion by ID
+      tags:
+      - Promotion
   /api/v1/promotion/list:
     get:
       description: Get a list of promotions
@@ -321,4 +344,70 @@ paths:
       summary: List promotions
       tags:
       - Promotion
+  /api/v1/vasitem:
+    post:
+      consumes:
+      - application/json
+      description: Create a new vas item
+      parameters:
+      - description: Vas Item object
+        in: body
+        name: vas_item
+        required: true
+        schema:
+          $ref: '#/definitions/entity.VasItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vas Item created successfully
+          schema:
+            type: string
+      summary: Create a vas item
+      tags:
+      - VasItem
+  /api/v1/vasitem/{id}:
+    get:
+      description: Get a vas item
+      parameters:
+      - description: Vas Item ID
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.VasItem'
+            type: array
+      summary: Get vas item
+      tags:
+      - VasItem
+  /api/v1/vasitem/list:
+    get:
+      description: Get a list of vas items
+      parameters:
+      - description: Item ID
+        format: int
+        in: query
+        name: item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.VasItem'
+            type: array
+      summary: List vas items
+      tags:
+      - VasItem
 swagger: "2.0"

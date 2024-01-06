@@ -44,7 +44,7 @@ func (h *CategoryHandler) List(c *gin.Context) {
 // @Produce json
 // @Param category body entity.Category true "Category object"
 // @Success 200 {string} string "Category created successfully"
-// @Router /api/v1/category/create [post]
+// @Router /api/v1/category [post]
 func (h *CategoryHandler) Create(c *gin.Context) {
 	var category entity.Category
 
