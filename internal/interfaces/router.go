@@ -1,15 +1,28 @@
 package interfaces
 
 import (
+	"log/slog"
+
+	"github.com/Furkan-Gulsen/Checkout-System/config"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/application"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/persistence"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/api"
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(g *gin.RouterGroup, repo *persistence.Repositories) {
-	// * Handlers for routes
-	categoryHandler := api.NewCategoryHandler(repo.Category)
-	itemHandler := api.NewItemHandler(repo.Item)
+func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
+	repositories, err := persistence.NewRepositories(cfg.Mongo)
+	if err != nil {
+		slog.Error("Failed to create data repositories: ", err)
+	}
+
+	// * Application Layer
+	itemApp := application.NewItemApp(repositories.Item, repositories.Category)
+	categoryApp := application.NewCategoryApp(repositories.Category)
+
+	// * Handlers
+	itemHandler := api.NewItemHandler(itemApp)
+	categoryHandler := api.NewCategoryHandler(categoryApp)
 
 	// * Category Routes
 	categoryRouterGroup := g.Group("/category")

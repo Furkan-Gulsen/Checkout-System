@@ -48,6 +48,7 @@ func (r *ItemRepository) Create(item *entity.Item) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	fmt.Printf("item: %+v\n", item)
 	item.Id = int(uuid.New().ID())
 	_, err := r.collection.InsertOne(ctx, item)
 	if err != nil {

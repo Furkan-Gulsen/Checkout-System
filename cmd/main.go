@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/config"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/persistence"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/middleware"
 	"github.com/Furkan-Gulsen/Checkout-System/pkg/logger"
@@ -62,13 +61,7 @@ func setupRouter(cfg *config.Config) *gin.Engine {
 
 	// * Create an API router group for version 1
 	apiRouter := router.Group("/api/v1")
-	repositories, err := persistence.NewRepositories(cfg.Mongo)
-	if err != nil {
-		slog.Error("Failed to create data repositories: ", err)
-		return router
-	}
-	// * Register API routes with the repositories
-	interfaces.RegisterRoutes(apiRouter, repositories)
+	interfaces.RegisterRoutes(apiRouter, cfg)
 
 	return router
 }
