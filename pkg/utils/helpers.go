@@ -6,7 +6,7 @@ import (
 )
 
 func GenerateID() int {
-	rand.Seed(time.Now().UnixNano())
-	randomInt := rand.Intn(9000) + 1000
-	return randomInt
+	seed := time.Now().UnixNano()
+	randomGenerator := rand.New(rand.NewSource(seed))
+	return randomGenerator.Intn(9000) + 1000
 }
