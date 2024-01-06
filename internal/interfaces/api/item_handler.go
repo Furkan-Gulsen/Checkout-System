@@ -82,26 +82,26 @@ func (h *ItemHandler) Create(c *gin.Context) {
 // @Failure 400 {object} map[string]interface{} "Bad Request"
 // @Failure 500 {object} map[string]interface{} "Internal Server Error"
 // @Router /api/v1/item/{id} [get]
-func (h *ItemHandler) GetById(ctx *gin.Context) {
-	paramID := ctx.Param("id")
+func (h *ItemHandler) GetById(c *gin.Context) {
+	paramID := c.Param("id")
 	if paramID == "" {
-		ctx.JSON(400, gin.H{"message": "ID is required", "status": false})
+		c.JSON(400, gin.H{"message": "ID is required", "status": false})
 		return
 	}
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		ctx.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
 		return
 	}
 
 	item, err := h.itemApp.GetById(id)
 	if err != nil {
-		ctx.JSON(500, gin.H{"message": err.Error(), "status": false})
+		c.JSON(500, gin.H{"message": err.Error(), "status": false})
 		return
 	}
 
-	ctx.JSON(200, gin.H{"message": item, "status": true})
+	c.JSON(200, gin.H{"message": item, "status": true})
 }
 
 // @Summary Delete an item by ID
@@ -112,23 +112,23 @@ func (h *ItemHandler) GetById(ctx *gin.Context) {
 // @Param id path int true "Item ID" Format(int)
 // @Success 200 {object} map[string]interface{}
 // @Router /api/v1/item/{id} [delete]
-func (h *ItemHandler) Delete(ctx *gin.Context) {
-	paramID := ctx.Param("id")
+func (h *ItemHandler) Delete(c *gin.Context) {
+	paramID := c.Param("id")
 	if paramID == "" {
-		ctx.JSON(400, gin.H{"message": "ID is required", "status": false})
+		c.JSON(400, gin.H{"message": "ID is required", "status": false})
 		return
 	}
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		ctx.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
 		return
 	}
 
 	if err := h.itemApp.Delete(id); err != nil {
-		ctx.JSON(500, gin.H{"message": err.Error(), "status": false})
+		c.JSON(500, gin.H{"message": err.Error(), "status": false})
 		return
 	}
 
-	ctx.JSON(200, gin.H{"message": "Item deleted successfully", "status": true})
+	c.JSON(200, gin.H{"message": "Item deleted successfully", "status": true})
 }

@@ -13,6 +13,7 @@ func RegisterRoutes(g *gin.RouterGroup, repo *persistence.Repositories) {
 	categoryRouterGroup := g.Group("/category")
 	categoryRouterGroup.GET("/list", categoryRouter.List)
 	categoryRouterGroup.POST("/create", categoryRouter.Create)
+	categoryRouterGroup.GET("/:id", categoryRouter.GetById)
 
 	// * Item Routes
 	itemRouter := api.NewItemHandler(repo.Item)

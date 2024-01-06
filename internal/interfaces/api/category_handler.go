@@ -1,6 +1,8 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/Furkan-Gulsen/Checkout-System/internal/application"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/gin-gonic/gin"
@@ -66,4 +68,36 @@ func (h *CategoryRouter) Create(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"status": true, "message": "Category created successfully"})
+}
+
+// @Summary Get a category by ID
+// @Description Get a category by ID
+// @Tags Category
+// @Produce json
+// @Param id path string true "Category ID"
+// @Success 200 {object} string
+// @Router /api/v1/category/{id} [get]
+func (h *CategoryRouter) GetById(c *gin.Context) {
+	paramID := c.Param("id")
+	if paramID == "" {
+		c.JSON(400, gin.H{"status": false, "message": "Category ID is required"})
+		return
+	}
+
+	id, err := strconv.Atoi(paramID)
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		return
+	}
+
+	category, err := h.categoryApp.GetByID(id)
+	if err != nil {
+		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"status":  true,
+		"message": category,
+	})
 }

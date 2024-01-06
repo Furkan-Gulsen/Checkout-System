@@ -8,7 +8,7 @@ func (v *defaultValidator) ValidateItemQuantity(quantity int) error {
 	if quantity <= 0 {
 		return fmt.Errorf("quantity must be greater than zero")
 	}
-	if quantity > 10 { // Örnek bir üst sınır.
+	if quantity > 10 {
 		return fmt.Errorf("quantity must not exceed 10")
 	}
 	return nil

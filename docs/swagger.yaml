@@ -38,6 +38,25 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/v1/category/{id}:
+    get:
+      description: Get a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get a category by ID
+      tags:
+      - Category
   /api/v1/category/create:
     post:
       consumes:

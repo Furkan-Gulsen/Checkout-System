@@ -56,3 +56,16 @@ func (r *CategoryRepository) Create(category entity.Category) error {
 
 	return nil
 }
+
+func (r *CategoryRepository) GetByID(id int) (entity.Category, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	var category entity.Category
+
+	if err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&category); err != nil {
+		return entity.Category{}, err
+	}
+
+	return category, nil
+}
