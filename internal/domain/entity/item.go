@@ -18,13 +18,12 @@ type Item struct {
 	Id         int      `json:"id" bson:"_id"`
 	CategoryID int      `json:"categoryId" bson:"categoryId" validate:"required"`
 	SellerID   int      `json:"sellerId" bson:"sellerId" validate:"required"`
+	CartID     int      `json:"cartId" bson:"cartId" validate:"required"`
 	Price      float64  `json:"price" bson:"price" validate:"required"`
 	Quantity   int      `json:"quantity" bson:"quantity" validate:"required,max=10"`
 	ItemType   ItemType `json:"itemType,omitempty" bson:"itemType,omitempty"`
-	// VasItems   []VasItem `json:"vasItems,omitempty" bson:"vasItems,omitempty"`
 }
 
-// Validate function validates the Item structure and handles errors.
 func (item Item) Validate() error {
 	validate := validator.New()
 	err := validate.Struct(item)
