@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CategoryRouter struct {
+type CategoryHandler struct {
 	categoryApp application.CategoryAppInterface
 }
 
-func NewCategoryRouter(categoryApp application.CategoryAppInterface) *CategoryRouter {
-	return &CategoryRouter{
+func NewCategoryHandler(categoryApp application.CategoryAppInterface) *CategoryHandler {
+	return &CategoryHandler{
 		categoryApp: categoryApp,
 	}
 }
@@ -24,7 +24,7 @@ func NewCategoryRouter(categoryApp application.CategoryAppInterface) *CategoryRo
 // @Produce json
 // @Success 200 {object} []entity.Category
 // @Router /api/v1/category/list [get]
-func (h *CategoryRouter) List(c *gin.Context) {
+func (h *CategoryHandler) List(c *gin.Context) {
 	categories, err := h.categoryApp.List()
 	if err != nil {
 		c.JSON(500, gin.H{"status": false, "message": err.Error()})
@@ -45,7 +45,7 @@ func (h *CategoryRouter) List(c *gin.Context) {
 // @Param category body entity.Category true "Category object"
 // @Success 200 {string} string "Category created successfully"
 // @Router /api/v1/category/create [post]
-func (h *CategoryRouter) Create(c *gin.Context) {
+func (h *CategoryHandler) Create(c *gin.Context) {
 	var category entity.Category
 
 	if err := c.ShouldBindJSON(&category); err != nil {
@@ -77,7 +77,7 @@ func (h *CategoryRouter) Create(c *gin.Context) {
 // @Param id path string true "Category ID"
 // @Success 200 {object} string
 // @Router /api/v1/category/{id} [get]
-func (h *CategoryRouter) GetById(c *gin.Context) {
+func (h *CategoryHandler) GetById(c *gin.Context) {
 	paramID := c.Param("id")
 	if paramID == "" {
 		c.JSON(400, gin.H{"status": false, "message": "Category ID is required"})

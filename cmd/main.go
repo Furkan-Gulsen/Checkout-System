@@ -1,13 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
+	"net/http"
+	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/config"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/persistence"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/middleware"
 	"github.com/Furkan-Gulsen/Checkout-System/pkg/logger"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
@@ -15,44 +18,72 @@ import (
 )
 
 func main() {
-	// * Setup Config
+	// * Load configuration settings
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		slog.Error("Failed to load config: %v", err)
+		slog.Error("Failed to load configuration: ", err)
+		return
 	}
 
-	fmt.Print("Config is loaded: ", cfg)
+	// * Create a Gin router and set up its middleware
+	router := setupRouter(cfg)
+	server := setupServer(cfg.Server.Port, router)
 
-	// * Setup Server
+	// * Graceful Shutdown
+	go utils.Graceful(server, 10*time.Second)
+
+	// * Start the HTTP server
+	if err := startServer(server); err != nil {
+		slog.Error("Failed to start the server: ", err)
+	}
+}
+
+func setupRouter(cfg *config.Config) *gin.Engine {
+	// * Create a new Gin router
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(middleware.CORSMiddleware())
 
-	// * Setup Prometheus
+	// * Set up Prometheus metrics collection
 	promLogger := logger.NewPrometheusLogger()
 	router.Use(logger.PrometheusMiddleware(promLogger))
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
-	// * Health Check
+	// * Define a health check endpoint
 	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "OK",
 		})
 	})
 
-	// * Swagger Routes for development
+	// * Serve Swagger documentation
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// * Setup Router
+	// * Create an API router group for version 1
 	apiRouter := router.Group("/api/v1")
 	repositories, err := persistence.NewRepositories(cfg.Mongo)
 	if err != nil {
-		slog.Error("Failed to create repositories: %v", err)
+		slog.Error("Failed to create data repositories: ", err)
+		return router
 	}
-	defer repositories.Close()
-
+	// * Register API routes with the repositories
 	interfaces.RegisterRoutes(apiRouter, repositories)
 
-	fmt.Print("Server is running on port: " + cfg.Server.Port + "\n")
-	router.Run(":" + cfg.Server.Port)
+	return router
+}
+
+func setupServer(port string, router *gin.Engine) *http.Server {
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+	return server
+}
+
+func startServer(server *http.Server) error {
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+	return nil
 }

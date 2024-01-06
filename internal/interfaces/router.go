@@ -7,21 +7,21 @@ import (
 )
 
 func RegisterRoutes(g *gin.RouterGroup, repo *persistence.Repositories) {
-	// * Category Routes
-	categoryRouter := api.NewCategoryRouter(repo.Category)
+	// * Handlers for routes
+	categoryHandler := api.NewCategoryHandler(repo.Category)
+	itemHandler := api.NewItemHandler(repo.Item)
 
+	// * Category Routes
 	categoryRouterGroup := g.Group("/category")
-	categoryRouterGroup.GET("/list", categoryRouter.List)
-	categoryRouterGroup.POST("/create", categoryRouter.Create)
-	categoryRouterGroup.GET("/:id", categoryRouter.GetById)
+	categoryRouterGroup.GET("/list", categoryHandler.List)
+	categoryRouterGroup.POST("/create", categoryHandler.Create)
+	categoryRouterGroup.GET("/:id", categoryHandler.GetById)
 
 	// * Item Routes
-	itemRouter := api.NewItemHandler(repo.Item)
-
 	itemRouterGroup := g.Group("/item")
-	itemRouterGroup.GET("/list", itemRouter.List)
-	itemRouterGroup.POST("/create", itemRouter.Create)
-	itemRouterGroup.GET("/:id", itemRouter.GetById)
-	itemRouterGroup.DELETE("/:id", itemRouter.Delete)
+	itemRouterGroup.GET("/list", itemHandler.List)
+	itemRouterGroup.POST("/create", itemHandler.Create)
+	itemRouterGroup.GET("/:id", itemHandler.GetById)
+	itemRouterGroup.DELETE("/:id", itemHandler.Delete)
 
 }

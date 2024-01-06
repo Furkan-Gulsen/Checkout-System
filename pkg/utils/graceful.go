@@ -2,27 +2,24 @@ package utils
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
 	"time"
 )
 
 func Graceful(server *http.Server, timeout time.Duration) {
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
+	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Println("Server is shutting down...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %s", err)
+		slog.Error("Server shutdown error: ", err)
+	} else {
+		slog.Info("Server has gracefully shut down.")
 	}
-
-	log.Println("Server gracefully stopped")
 }
