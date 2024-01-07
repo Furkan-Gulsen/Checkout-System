@@ -1,0 +1,26 @@
+version: '3'
+services:
+  db:
+    image: mongo:latest
+    container_name: db
+    restart: on-failure
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/dev/mongo:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  checkout:
+    container_name: checkout
+    build: .
+    environment:
+      - APP_ENV=docker
+    ports:
+      - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
