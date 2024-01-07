@@ -27,12 +27,11 @@ func NewPromotionHandler(promotionApp application.PromotionAppInterface) *Promot
 func (h *PromotionHandler) List(c *gin.Context) {
 	promotions, err := h.promotionApp.List()
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Promotions listed successfully",
 		"data":    promotions,
 	})
@@ -50,7 +49,7 @@ func (h *PromotionHandler) Create(c *gin.Context) {
 	var data dto.PromotionRequest
 
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(400, gin.H{"status": false, "message": err.Error()})
+		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -58,7 +57,6 @@ func (h *PromotionHandler) Create(c *gin.Context) {
 	err := entityData.Validate()
 	if err != nil {
 		c.JSON(400, gin.H{
-			"status":  false,
 			"message": err.Error(),
 		})
 		return
@@ -66,12 +64,11 @@ func (h *PromotionHandler) Create(c *gin.Context) {
 
 	response, createErr := h.promotionApp.Create(&entityData)
 	if createErr != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Promotion created successfully",
 		"data":    response,
 	})
@@ -87,24 +84,23 @@ func (h *PromotionHandler) Create(c *gin.Context) {
 func (h *PromotionHandler) GetById(c *gin.Context) {
 	paramID := c.Param("id")
 	if paramID == "" {
-		c.JSON(400, gin.H{"message": "ID is required", "status": false})
+		c.JSON(400, gin.H{"message": "ID is required"})
 		return
 	}
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format"})
 		return
 	}
 
 	promotion, err := h.promotionApp.GetById(id)
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Promotion found",
 		"data":    promotion,
 	})

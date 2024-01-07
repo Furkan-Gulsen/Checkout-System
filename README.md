@@ -61,10 +61,9 @@ Mikroservisler:
 - MongoDB
 - Docker
 - Swagger
-- Notification system (vakit kalırsa)
-- GitHub Actions (vakit kalırsa)
-- Prometheus (vakit kalırsa)
-- Api Gateway (vakit kalırsa)
+- Jenkins
+
+* Prometheus (vakit kalırsa)
 
 ## Mimari
 

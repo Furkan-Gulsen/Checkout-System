@@ -43,6 +43,7 @@ func setupRouter(cfg *config.Config) *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(middleware.CORSMiddleware())
+	router.Use(utils.ErrorHandler())
 
 	// * Set up Prometheus metrics collection
 	promLogger := logger.NewPrometheusLogger()

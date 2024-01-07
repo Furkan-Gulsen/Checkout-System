@@ -1,5 +1,7 @@
 APP=TY_Case
 
+### General
+
 install:
 	@echo "Installing..."
 	go mod download
@@ -20,6 +22,8 @@ swag:
 	@echo "Generating swagger..."
 	swag init -g cmd/main.go -d ./
 
+
+### Docker
 up:
 	@echo "Running docker-compose..."
 	docker-compose up -d --build
@@ -27,3 +31,14 @@ up:
 down:
 	@echo "Stopping docker-compose..."
 	docker-compose down
+
+
+### Tests
+persistance-tests:
+	@echo "Running persistance tests..."
+	go test -v ./internal/infrastructure/persistence
+
+
+application-tests:
+	@echo "Running application tests..."
+	go test -v ./internal/application

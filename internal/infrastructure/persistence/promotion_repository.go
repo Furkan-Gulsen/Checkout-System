@@ -31,7 +31,6 @@ func (r *PromotionRepository) List() ([]*entity.Promotion, error) {
 	defer cancel()
 
 	var promotions []*entity.Promotion
-
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
@@ -40,7 +39,6 @@ func (r *PromotionRepository) List() ([]*entity.Promotion, error) {
 	if err := cursor.All(ctx, &promotions); err != nil {
 		return nil, err
 	}
-
 	return promotions, nil
 }
 
@@ -49,12 +47,10 @@ func (r *PromotionRepository) Create(promotion *entity.Promotion) (*entity.Promo
 	defer cancel()
 
 	promotion.Id = utils.GenerateID()
-
 	_, err := r.collection.InsertOne(ctx, promotion)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating promotion: %v", err)
 	}
-
 	return promotion, nil
 }
 
@@ -63,11 +59,9 @@ func (r *PromotionRepository) GetById(promotionID int) (*entity.Promotion, error
 	defer cancel()
 
 	var promotion entity.Promotion
-
 	err := r.collection.FindOne(ctx, bson.M{"_id": promotionID}).Decode(&promotion)
 	if err != nil {
 		return nil, err
 	}
-
 	return &promotion, nil
 }
