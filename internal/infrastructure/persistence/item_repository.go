@@ -84,3 +84,15 @@ func (r *ItemRepository) Delete(itemID int) error {
 
 	return nil
 }
+
+func (r *ItemRepository) Update(item *entity.Item) (*entity.Item, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": item.Id}, bson.M{"$set": item})
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}

@@ -10,7 +10,7 @@ import (
 type ItemType int
 
 const (
-	DigitalItem PromotionType = iota + 1
+	DigitalItem ItemType = iota + 1
 	DefaultItem
 )
 
@@ -21,7 +21,7 @@ type Item struct {
 	CartID     int      `json:"cartId" bson:"cartId" validate:"required"`
 	Price      float64  `json:"price" bson:"price" validate:"required"`
 	Quantity   int      `json:"quantity" bson:"quantity" validate:"required,max=10"`
-	ItemType   ItemType `json:"itemType,omitempty" bson:"itemType,omitempty"`
+	ItemType   ItemType `json:"itemType" bson:"itemType" validate:"oneof=1 2"`
 }
 
 func (item Item) Validate() error {
@@ -33,13 +33,14 @@ func (item Item) Validate() error {
 	}
 
 	var customValidationErrors []string
+
 	for _, err := range err.(validator.ValidationErrors) {
-		tag := err.Tag()
-		structField := err.StructField()
-		if tag == "required" {
-			customValidationErrors = append(customValidationErrors, structField+" is required.")
-		} else if tag == "max" {
-			customValidationErrors = append(customValidationErrors, structField+" must be less than or equal to 10.")
+		if err.Tag() == "required" {
+			customValidationErrors = append(customValidationErrors, err.Field()+" is required.")
+		} else if err.Tag() == "max" {
+			customValidationErrors = append(customValidationErrors, err.Field()+" max value is "+err.Param()+".")
+		} else if err.Tag() == "oneof" {
+			customValidationErrors = append(customValidationErrors, err.Field()+" must be one of "+err.Param()+".")
 		}
 	}
 

@@ -7,6 +7,7 @@ import (
 type ItemRepositoryI interface {
 	ListByCartId(cartId int) ([]*entity.Item, error)
 	Create(item *entity.Item) error
+	Update(item *entity.Item) (*entity.Item, error)
 	GetById(itemID int) (*entity.Item, error)
 	Delete(itemID int) error
 }

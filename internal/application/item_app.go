@@ -16,6 +16,7 @@ type itemApp struct {
 type ItemAppInterface interface {
 	ListByCartId(int) ([]*entity.Item, error)
 	Create(*entity.Item) error
+	Update(*entity.Item) (*entity.Item, error)
 	GetById(int) (*entity.Item, error)
 	Delete(int) error
 }
@@ -33,13 +34,20 @@ func (app *itemApp) ListByCartId(cartId int) ([]*entity.Item, error) {
 
 func (app *itemApp) Create(item *entity.Item) error {
 	category, err := app.categoryApp.GetByID(item.CategoryID)
-	if err != nil {
+	if err != nil || category == nil {
 		slog.Error("Item category not found. Error: ", err)
 		return fmt.Errorf("item category not found. CategoryID: %d", item.CategoryID)
 	}
 
 	item.ItemType = category.ItemType
-	fmt.Printf("itemType: %+v\n", item.ItemType)
+
+	if item.ItemType == entity.DigitalItem && item.Quantity > 5 {
+		slog.Error("Digital item quantity can not be more than 5.")
+		return fmt.Errorf("digital item quantity can not be more than 5. Quantity: %d", item.Quantity)
+	} else if item.ItemType == entity.DefaultItem && item.Quantity > 10 {
+		slog.Error("Default item quantity can not be more than 10.")
+		return fmt.Errorf("default item quantity can not be more than 10. Quantity: %d", item.Quantity)
+	}
 
 	return app.itemRepo.Create(item)
 }
@@ -50,4 +58,8 @@ func (app *itemApp) GetById(itemID int) (*entity.Item, error) {
 
 func (app *itemApp) Delete(itemID int) error {
 	return app.itemRepo.Delete(itemID)
+}
+
+func (app *itemApp) Update(item *entity.Item) (*entity.Item, error) {
+	return app.itemRepo.Update(item)
 }
