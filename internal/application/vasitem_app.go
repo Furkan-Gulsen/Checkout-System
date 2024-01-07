@@ -35,14 +35,34 @@ func (app *vasItemApp) GetById(vasItemId int) (*entity.VasItem, error) {
 }
 
 func (app *vasItemApp) Create(vasItem *entity.VasItem) (*entity.VasItem, error) {
-	// _, err := app.categoryApp.GetByID(vasItem.CategoryId)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("category not found. Category ID: %d", vasItem.CategoryId)
-	// }
+	// * Check Seller ID
+	if vasItem.SellerId != 5003 {
+		return nil, fmt.Errorf("vasItem seller id must be 5003. Seller ID: %d", vasItem.SellerId)
+	}
 
-	_, err := app.itemApp.GetById(vasItem.ItemId)
-	if err != nil {
+	// * Check if item exists
+	item, getItemErr := app.itemApp.GetById(vasItem.ItemId)
+	if getItemErr != nil {
 		return nil, fmt.Errorf("item not found. Item ID: %d", vasItem.ItemId)
+	}
+	fmt.Println("item: ", item.CategoryID)
+
+	// * Check if item category id is 1001 or 3004
+	if item.CategoryID != 1001 && item.CategoryID != 3004 {
+		return nil, fmt.Errorf("vasItem cannot be added to this product. Category ID: %d", vasItem.CategoryId)
+	}
+
+	// * Check if vasItem quantity is more than 3
+	vasItems, listVasItemErr := app.ListByItemId(vasItem.ItemId)
+	if listVasItemErr != nil {
+		return nil, fmt.Errorf("error while listing vasItems. Item ID: %d", vasItem.ItemId)
+	}
+	vasItemsQuantity := vasItem.Quantity
+	for _, vasItem := range vasItems {
+		vasItemsQuantity += vasItem.Quantity
+	}
+	if vasItemsQuantity > 3 {
+		return nil, fmt.Errorf("vasItem quantity cannot be more than 3. Item ID: %d", vasItem.ItemId)
 	}
 
 	return app.vasItemRepo.Create(vasItem)
