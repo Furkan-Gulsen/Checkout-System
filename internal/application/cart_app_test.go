@@ -34,7 +34,7 @@ func (m *mockCartRepository) Delete(id int) error {
 
 var CartAppMock repository.CartRepositoryI = &mockCartRepository{}
 
-func TestAll(t *testing.T) {
+func TestAllForCart(t *testing.T) {
 	t.Run("TestSaveCartToUncreatedCart_Success", func(t *testing.T) {
 		saveCartToUncreatedCart_Success(t)
 	})
@@ -55,6 +55,15 @@ func TestAll(t *testing.T) {
 	})
 	t.Run("TestAddingItemsToCartWithTotalPricePromotion_Success", func(t *testing.T) {
 		addingItemsToCartWithTotalPricePromotion_Success(t)
+	})
+	t.Run("TestApplySameSellerPromotion", func(t *testing.T) {
+		applySameSellerPromotion(t)
+	})
+	t.Run("TestApplySameCategoryPromotion", func(t *testing.T) {
+		applyCategoryPromotion(t)
+	})
+	t.Run("TestApplyTotalPricePromotion", func(t *testing.T) {
+		applyTotalPricePromotion(t)
 	})
 }
 
@@ -425,3 +434,216 @@ func addingItemsToCartWithTotalPricePromotion_Success(t *testing.T) {
 	// assert.Equal(t, float64(1500), cart.TotalPrice)
 	// assert.Equal(t, float64(100), cart.TotalDiscount)
 }
+
+func applySameSellerPromotion(t *testing.T) {
+	const promotionId = 1234
+	const cartId = 1501
+
+	getByIDPromotionRepo = func(id int) (*entity.Promotion, error) {
+		return &entity.Promotion{
+			Id:            promotionId,
+			PromotionType: entity.PromotionType(1),
+			SameSellerP: &entity.SameSellerPromotionDiscount{
+				DiscountRate: 50,
+			},
+		}, nil
+	}
+
+	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        1000,
+			TotalPrice:         1000,
+			TotalDiscount:      0,
+			AppliedPromotionId: 0,
+		}, nil
+	}
+
+	listItemRepo = func(id int) ([]*entity.Item, error) {
+		return []*entity.Item{
+			{
+				Id:         5001,
+				CategoryID: 3003,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+			{
+				Id:         5002,
+				CategoryID: 3003,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+		}, nil
+	}
+
+	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	// cart, err := app.ApplyPromotion(cartId, promotionId)
+	// assert.Nil(t, err)
+	// assert.NotNil(t, cart)
+	// assert.Equal(t, float64(500), cart.TotalAmount)
+	// assert.Equal(t, float64(1000), cart.TotalPrice)
+	// assert.Equal(t, float64(500), cart.TotalDiscount)
+	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+}
+
+func applyCategoryPromotion(t *testing.T) {
+	const promotionId = 1234
+	const cartId = 1501
+	const categoryId = 3001
+
+	getByIDPromotionRepo = func(id int) (*entity.Promotion, error) {
+		return &entity.Promotion{
+			Id:            promotionId,
+			PromotionType: entity.PromotionType(2),
+			CategoryP: &entity.CategoryPromotionDiscount{
+				CategoryID:   categoryId,
+				DiscountRate: 50,
+			},
+		}, nil
+	}
+
+	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        1000,
+			TotalPrice:         1000,
+			TotalDiscount:      0,
+			AppliedPromotionId: 0,
+		}, nil
+	}
+
+	listItemRepo = func(id int) ([]*entity.Item, error) {
+		return []*entity.Item{
+			{
+				Id:         5001,
+				CategoryID: categoryId,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+			{
+				Id:         5002,
+				CategoryID: 3003,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+		}, nil
+	}
+
+	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	// cart, err := app.ApplyPromotion(cartId, promotionId)
+	// assert.Nil(t, err)
+	// assert.NotNil(t, cart)
+	// assert.Equal(t, float64(750), cart.TotalAmount)
+	// assert.Equal(t, float64(1000), cart.TotalPrice)
+	// assert.Equal(t, float64(250), cart.TotalDiscount)
+	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+}
+
+func applyTotalPricePromotion(t *testing.T) {
+	const promotionId = 1234
+	const cartId = 1501
+	const categoryId = 3001
+
+	getByIDPromotionRepo = func(id int) (*entity.Promotion, error) {
+		return &entity.Promotion{
+			Id:            promotionId,
+			PromotionType: entity.PromotionType(3),
+			TotalPriceP: []*entity.TotalPricePromotionDiscount{
+				{
+					PriceRangeStart: 1000,
+					PriceRangeEnd:   2000,
+					DiscountAmount:  200,
+				},
+			},
+		}, nil
+	}
+
+	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        1500,
+			TotalPrice:         1500,
+			TotalDiscount:      0,
+			AppliedPromotionId: 0,
+		}, nil
+	}
+
+	listItemRepo = func(id int) ([]*entity.Item, error) {
+		return []*entity.Item{
+			{
+				Id:         5001,
+				CategoryID: categoryId,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   7,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+			{
+				Id:         5002,
+				CategoryID: 3003,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   8,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+		}, nil
+	}
+
+	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	// cart, err := app.ApplyPromotion(cartId, promotionId)
+	// assert.Nil(t, err)
+	// assert.NotNil(t, cart)
+	// assert.Equal(t, float64(1300), cart.TotalAmount)
+	// assert.Equal(t, float64(1500), cart.TotalPrice)
+	// assert.Equal(t, float64(200), cart.TotalDiscount)
+	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+}
+
+// func ResetCart(t *testing.T) {
+// 	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+// 		return &entity.Cart{
+// 			Id:                 1501,
+// 			TotalAmount:        0,
+// 			TotalPrice:         0,
+// 			TotalDiscount:      0,
+// 			AppliedPromotionId: 0,
+// 		}, nil
+// 	}
+
+// 	updateCartRepo = func(cart *entity.Cart) (*entity.Cart, error) {
+// 		return &entity.Cart{
+// 			Id:                 1501,
+// 			TotalAmount:        0,
+// 			TotalPrice:         0,
+// 			TotalDiscount:      0,
+// 			AppliedPromotionId: 0,
+// 		}, nil
+// 	}
+
+// 	deleteItemRepo = func(id int) error {
+// 		return nil
+// 	}
+
+// 	deleteVasItemRepo = func(id int) error {
+// 		return nil
+// 	}
+
+// 	deleteCartRepo = func(id int) error {
+// 		return nil
+// 	}
+
+// }

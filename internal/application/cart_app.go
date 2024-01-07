@@ -30,11 +30,11 @@ func NewCartApp(cartRepo repository.CartRepositoryI, itemApp ItemAppInterface, v
 }
 
 type CartAppInterface interface {
-	ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error)
+	ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) // OK
 	Display(cartId int) (*dto.DisplayCartDTO, error)
 	ResetCart(cartId int) error
-	AddItem(cartId int, item *entity.Item) (*entity.Cart, error)
-	UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart, error)
+	AddItem(cartId int, item *entity.Item) (*entity.Cart, error)        // OK
+	UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart, error) // OK
 }
 
 func (app *cartApp) ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) {
@@ -105,7 +105,7 @@ func calcCartPricesWithPromotion(cart *entity.Cart, items []*entity.Item, promot
 		totalDiscount = sameSellerTotalDiscount
 	}
 
-	fmt.Println("totalDiscount: ", totalDiscount)
+	fmt.Println("* totalDiscount: ", totalDiscount)
 	cart.TotalDiscount = totalDiscount
 	cart.TotalAmount = cart.TotalPrice - totalDiscount
 
@@ -166,7 +166,6 @@ func (app *cartApp) ResetCart(cartId int) error {
 	}
 
 	var wg sync.WaitGroup
-
 	for _, item := range items {
 		wg.Add(1)
 		go func(item *entity.Item) {
@@ -179,7 +178,6 @@ func (app *cartApp) ResetCart(cartId int) error {
 			}
 		}(item)
 	}
-
 	wg.Wait()
 
 	return nil
