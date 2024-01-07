@@ -30,67 +30,32 @@ func (h *ItemHandler) ListByCartId(c *gin.Context) {
 	queryCartId := query.Get("cart_id")
 
 	if queryCartId == "" {
-		c.JSON(400, gin.H{"status": false, "message": "Cart ID is required"})
+		c.JSON(400, gin.H{"message": "Cart ID is required"})
 		return
 	}
 
 	cartId, err := strconv.Atoi(queryCartId)
 	if err != nil {
-		c.JSON(400, gin.H{"status": false, "message": "Invalid Cart ID format"})
+		c.JSON(400, gin.H{"message": "Invalid Cart ID format"})
 		return
 	}
 
 	items, err := h.itemApp.ListByCartId(cartId)
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	if len(items) == 0 {
-		c.JSON(200, gin.H{"status": false, "message": "No items found"})
+		c.JSON(200, gin.H{"message": "No items found"})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Items found",
 		"data":    items,
 	})
 }
-
-// // @Summary Create an item
-// // @Description Create a new item
-// // @Tags Item
-// // @Accept json
-// // @Produce json
-// // @Param item body entity.Item true "Item object"
-// // @Success 200 {string} string "Item created successfully"
-// // @Router /api/v1/item [post]
-// func (h *ItemHandler) Create(c *gin.Context) {
-// 	var item entity.Item
-
-// 	if err := c.ShouldBindJSON(&item); err != nil {
-// 		c.JSON(400, gin.H{"status": false, "message": err.Error()})
-// 		return
-// 	}
-
-// 	err := item.Validate()
-// 	if err != nil {
-// 		c.JSON(400, gin.H{
-// 			"status":  false,
-// 			"message": err.Error(),
-// 		})
-// 		return
-// 	}
-
-// 	if err := h.itemApp.Create(&item); err != nil {
-// 		c.JSON(500, gin.H{"status": false, "message": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(200, gin.H{"status": true, "message": "Item created successfully"})
-
-// }
 
 // @Summary Get an item by ID
 // @Description Get an item by its ID
@@ -105,21 +70,21 @@ func (h *ItemHandler) ListByCartId(c *gin.Context) {
 func (h *ItemHandler) GetById(c *gin.Context) {
 	paramID := c.Param("id")
 	if paramID == "" {
-		c.JSON(400, gin.H{"message": "ID is required", "status": false})
+		c.JSON(400, gin.H{"message": "ID is required"})
 		return
 	}
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format"})
 		return
 	}
 
 	item, err := h.itemApp.GetById(id)
 	if err != nil {
-		c.JSON(500, gin.H{"message": err.Error(), "status": false})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"status": true, "message": "Item found", "data": item})
+	c.JSON(200, gin.H{"message": "Item found", "data": item})
 }

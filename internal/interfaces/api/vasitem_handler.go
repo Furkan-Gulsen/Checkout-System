@@ -31,29 +31,28 @@ func (h *VasItemHandler) ListByItemId(c *gin.Context) {
 	queryItemId := query.Get("item_id")
 
 	if queryItemId == "" {
-		c.JSON(400, gin.H{"status": false, "message": "Item ID is required"})
+		c.JSON(400, gin.H{"message": "Item ID is required"})
 		return
 	}
 
 	itemId, err := strconv.Atoi(queryItemId)
 	if err != nil {
-		c.JSON(400, gin.H{"status": false, "message": "Invalid Item ID format"})
+		c.JSON(400, gin.H{"message": "Invalid Item ID format"})
 		return
 	}
 
 	vasItems, err := h.vasItemApp.ListByItemId(itemId)
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	if len(vasItems) == 0 {
-		c.JSON(200, gin.H{"status": false, "message": "No vas items found"})
+		c.JSON(200, gin.H{"message": "No vas items found"})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Vas items found",
 		"data":    vasItems,
 	})
@@ -69,7 +68,7 @@ func (h *VasItemHandler) ListByItemId(c *gin.Context) {
 func (h *VasItemHandler) GetById(c *gin.Context) {
 	paramID := c.Param("id")
 	if paramID == "" {
-		c.JSON(400, gin.H{"status": false, "message": "Vas Item ID is required"})
+		c.JSON(400, gin.H{"message": "Vas Item ID is required"})
 		return
 	}
 
@@ -77,23 +76,22 @@ func (h *VasItemHandler) GetById(c *gin.Context) {
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format"})
 		return
 	}
 
 	vasItem, err := h.vasItemApp.GetById(id)
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	if vasItem == nil {
-		c.JSON(200, gin.H{"status": false, "message": "No vas item found"})
+		c.JSON(200, gin.H{"message": "No vas item found"})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Vas item found",
 		"data":    vasItem,
 	})
@@ -111,18 +109,17 @@ func (h *VasItemHandler) Create(c *gin.Context) {
 	var vasItem *entity.VasItem
 
 	if err := c.ShouldBindJSON(&vasItem); err != nil {
-		c.JSON(400, gin.H{"status": false, "message": err.Error()})
+		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 
 	vasItem, createErr := h.vasItemApp.Create(vasItem)
 	if createErr != nil {
-		c.JSON(500, gin.H{"status": false, "message": createErr.Error()})
+		c.JSON(500, gin.H{"message": createErr.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Vas Item created successfully",
 		"data":    vasItem,
 	})
@@ -138,23 +135,22 @@ func (h *VasItemHandler) Create(c *gin.Context) {
 func (h *VasItemHandler) Delete(c *gin.Context) {
 	paramID := c.Param("id")
 	if paramID == "" {
-		c.JSON(400, gin.H{"status": false, "message": "Vas Item ID is required"})
+		c.JSON(400, gin.H{"message": "Vas Item ID is required"})
 		return
 	}
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format"})
 		return
 	}
 
 	if err := h.vasItemApp.DeleteById(id); err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Vas Item deleted successfully",
 	})
 }
