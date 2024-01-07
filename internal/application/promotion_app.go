@@ -11,7 +11,7 @@ type promotionApp struct {
 
 type PromotionAppInterface interface {
 	List() ([]*entity.Promotion, error)
-	Create(*entity.Promotion) error
+	Create(*entity.Promotion) (*entity.Promotion, error)
 	GetById(int) (*entity.Promotion, error)
 }
 
@@ -25,7 +25,7 @@ func (app *promotionApp) List() ([]*entity.Promotion, error) {
 	return app.promotionRepo.List()
 }
 
-func (app *promotionApp) Create(promotion *entity.Promotion) error {
+func (app *promotionApp) Create(promotion *entity.Promotion) (*entity.Promotion, error) {
 	return app.promotionRepo.Create(promotion)
 }
 

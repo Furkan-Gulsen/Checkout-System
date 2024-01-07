@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
@@ -43,7 +44,7 @@ func (r *PromotionRepository) List() ([]*entity.Promotion, error) {
 	return promotions, nil
 }
 
-func (r *PromotionRepository) Create(promotion *entity.Promotion) error {
+func (r *PromotionRepository) Create(promotion *entity.Promotion) (*entity.Promotion, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -51,10 +52,10 @@ func (r *PromotionRepository) Create(promotion *entity.Promotion) error {
 
 	_, err := r.collection.InsertOne(ctx, promotion)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error while creating promotion: %v", err)
 	}
 
-	return nil
+	return promotion, nil
 }
 
 func (r *PromotionRepository) GetById(promotionID int) (*entity.Promotion, error) {

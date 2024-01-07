@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/application"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/dto"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,18 +42,19 @@ func (h *PromotionHandler) List(c *gin.Context) {
 // @Tags Promotion
 // @Accept json
 // @Produce json
-// @Param promotion body entity.Promotion true "Promotion object"
+// @Param promotion body dto.PromotionRequest true "Promotion object"
 // @Success 200 {string} string "Promotion created successfully"
 // @Router /api/v1/promotion [post]
 func (h *PromotionHandler) Create(c *gin.Context) {
-	var promotion entity.Promotion
+	var data dto.PromotionRequest
 
-	if err := c.ShouldBindJSON(&promotion); err != nil {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(400, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
-	err := promotion.Validate()
+	entityData := data.ToEntity()
+	err := entityData.Validate()
 	if err != nil {
 		c.JSON(400, gin.H{
 			"status":  false,
@@ -62,7 +63,8 @@ func (h *PromotionHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.promotionApp.Create(&promotion); err != nil {
+	response, createErr := h.promotionApp.Create(&entityData)
+	if createErr != nil {
 		c.JSON(500, gin.H{"status": false, "message": err.Error()})
 		return
 	}
@@ -70,6 +72,7 @@ func (h *PromotionHandler) Create(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status":  true,
 		"message": "Promotion created successfully",
+		"data":    response,
 	})
 }
 
