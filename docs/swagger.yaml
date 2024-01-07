@@ -1,13 +1,49 @@
 definitions:
+  dto.CategoryRequest:
+    properties:
+      itemType:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.ItemCreateRequest:
+    properties:
+      cartId:
+        type: integer
+      categoryId:
+        type: integer
+      itemType:
+        $ref: '#/definitions/entity.ItemType'
+      price:
+        type: number
+      quantity:
+        type: integer
+      sellerId:
+        type: integer
+    type: object
+  dto.PromotionRequest:
+    properties:
+      categoryPromotion:
+        $ref: '#/definitions/entity.CategoryPromotionDiscount'
+      promotionType:
+        type: integer
+      sameSellerPromotion:
+        $ref: '#/definitions/entity.SameSellerPromotionDiscount'
+      totalPricePromotions:
+        items:
+          $ref: '#/definitions/entity.TotalPricePromotionDiscount'
+        type: array
+    type: object
   entity.Category:
     properties:
       id:
         type: integer
       itemType:
+        allOf:
+        - $ref: '#/definitions/entity.ItemType'
         enum:
         - 1
         - 2
-        type: integer
       name:
         type: string
     required:
@@ -35,7 +71,11 @@ definitions:
       id:
         type: integer
       itemType:
-        type: integer
+        allOf:
+        - $ref: '#/definitions/entity.ItemType'
+        enum:
+        - 1
+        - 2
       price:
         type: number
       quantity:
@@ -50,6 +90,14 @@ definitions:
     - quantity
     - sellerId
     type: object
+  entity.ItemType:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - DigitalItem
+    - DefaultItem
   entity.Promotion:
     properties:
       categoryPromotion:
@@ -77,15 +125,11 @@ definitions:
     - 1
     - 2
     - 3
-    - 1
-    - 2
     type: integer
     x-enum-varnames:
     - SameSellerPromotion
     - CategoryPromotion
     - TotalPricePromotion
-    - DigitalItem
-    - DefaultItem
   entity.SameSellerPromotionDiscount:
     properties:
       discountRate:
@@ -175,6 +219,33 @@ paths:
       summary: Display cart
       tags:
       - Cart
+  /api/v1/cart/{cartId}/item:
+    post:
+      consumes:
+      - application/json
+      description: Add an item to a cart
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cartId
+        required: true
+        type: integer
+      - description: Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ItemCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item added successfully
+          schema:
+            type: string
+      summary: Add item
+      tags:
+      - Cart
   /api/v1/cart/{cartId}/promotion/{promotionId}:
     post:
       consumes:
@@ -212,12 +283,12 @@ paths:
         name: category
         required: true
         schema:
-          $ref: '#/definitions/entity.Category'
+          $ref: '#/definitions/dto.CategoryRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Category created successfully
+          description: OK
           schema:
             type: string
       summary: Create a category
@@ -257,51 +328,7 @@ paths:
       summary: List categories
       tags:
       - Category
-  /api/v1/item:
-    post:
-      consumes:
-      - application/json
-      description: Create a new item
-      parameters:
-      - description: Item object
-        in: body
-        name: item
-        required: true
-        schema:
-          $ref: '#/definitions/entity.Item'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Item created successfully
-          schema:
-            type: string
-      summary: Create an item
-      tags:
-      - Item
   /api/v1/item/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete an item by its ID
-      parameters:
-      - description: Item ID
-        format: int
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Delete an item by ID
-      tags:
-      - Item
     get:
       consumes:
       - application/json
@@ -366,7 +393,7 @@ paths:
         name: promotion
         required: true
         schema:
-          $ref: '#/definitions/entity.Promotion'
+          $ref: '#/definitions/dto.PromotionRequest'
       produces:
       - application/json
       responses:

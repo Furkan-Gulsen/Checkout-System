@@ -18,10 +18,10 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 
 	// * Application Layer
 	categoryApp := application.NewCategoryApp(repositories.Category)
+	promotionApp := application.NewPromotionApp(repositories.Promotion)
 	itemApp := application.NewItemApp(repositories.Item, categoryApp)
 	vasitemApp := application.NewVasItemApp(repositories.VasItem, categoryApp, itemApp)
-	promotionApp := application.NewPromotionApp(repositories.Promotion)
-	cartApp := application.NewCartApp(repositories.Cart, repositories.Item, repositories.VasItem, repositories.Promotion)
+	cartApp := application.NewCartApp(repositories.Cart, itemApp, vasitemApp, promotionApp)
 
 	// * Handlers
 	itemHandler := api.NewItemHandler(itemApp)
@@ -39,9 +39,7 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	// * Item Routes
 	itemRouterGroup := g.Group("/item")
 	itemRouterGroup.GET("/list", itemHandler.ListByCartId)
-	itemRouterGroup.POST("/", itemHandler.Create)
 	itemRouterGroup.GET("/:id", itemHandler.GetById)
-	itemRouterGroup.DELETE("/:id", itemHandler.Delete)
 
 	// * Promotion Routes
 	promotionRouterGroup := g.Group("/promotion")
@@ -60,4 +58,5 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	cartRouterGroup.POST("/:cartId/promotion/:promotionId", cartHandler.ApplyPromotion)
 	cartRouterGroup.GET("/:cartId", cartHandler.Display)
 	cartRouterGroup.DELETE("/:cartId", cartHandler.ResetCart)
+	cartRouterGroup.POST("/:cartId/item", cartHandler.AddItem)
 }

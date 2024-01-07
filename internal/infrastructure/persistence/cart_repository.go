@@ -25,7 +25,7 @@ func NewCartRepository(d *database.Database, dbName string) *CartRepository {
 // CartRepository implements repository.CartRepositoryI interface
 var _ repository.CartRepositoryI = &CartRepository{}
 
-func (r *CartRepository) Create(cart entity.Cart) (entity.Cart, error) {
+func (r *CartRepository) Create(cart *entity.Cart) (*entity.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -33,13 +33,13 @@ func (r *CartRepository) Create(cart entity.Cart) (entity.Cart, error) {
 
 	_, err := r.collection.InsertOne(ctx, cart)
 	if err != nil {
-		return entity.Cart{}, err
+		return nil, err
 	}
 
 	return cart, nil
 }
 
-func (r *CartRepository) GetByID(id int) (entity.Cart, error) {
+func (r *CartRepository) GetByID(id int) (*entity.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -47,19 +47,19 @@ func (r *CartRepository) GetByID(id int) (entity.Cart, error) {
 
 	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&cart)
 	if err != nil {
-		return entity.Cart{}, err
+		return nil, err
 	}
 
-	return cart, nil
+	return &cart, nil
 }
 
-func (r *CartRepository) Update(cart entity.Cart) (entity.Cart, error) {
+func (r *CartRepository) Update(cart *entity.Cart) (*entity.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": cart.Id}, bson.M{"$set": cart})
 	if err != nil {
-		return entity.Cart{}, err
+		return nil, err
 	}
 
 	return cart, nil

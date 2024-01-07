@@ -2,10 +2,13 @@ package application
 
 import (
 	"fmt"
+	"log/slog"
 	"sync"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/dto"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 )
 
 var _ CartAppInterface = &cartApp{}
@@ -27,39 +30,119 @@ func NewCartApp(cartRepo repository.CartRepositoryI, itemApp ItemAppInterface, v
 }
 
 type CartAppInterface interface {
-	ApplyPromotion(cartId int, promotionId int) error
-	Display(cartId int) (entity.Cart, error)
+	ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error)
+	Display(cartId int) (*dto.DisplayCartDTO, error)
 	ResetCart(cartId int) error
+	AddItem(cartId int, item *entity.Item) (*entity.Item, error)
+	UpdateCartPriceAndQuantity(cartId int) (*entity.Cart, error)
 }
 
-func (app *cartApp) ApplyPromotion(cartId int, promotionId int) error {
+func (app *cartApp) ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) {
 	cart, err := app.cartRepo.GetByID(cartId)
 	if err != nil {
-		return fmt.Errorf("failed to apply promotion: %v", err)
+		slog.Error("Cart not found. Error: ", err)
+		return nil, fmt.Errorf("cart not found. CartID: %d", cartId)
 	}
 
 	if cart.AppliedPromotionId != 0 {
-		return fmt.Errorf("promotion already applied")
+		return nil, fmt.Errorf("promotion already applied")
 	}
 
 	promotion, err := app.promotionApp.GetById(promotionId)
 	if err != nil {
-		return fmt.Errorf("failed to apply promotion: %v", err)
+		slog.Error("Promotion not found. Error: ", err)
+		return nil, fmt.Errorf("promotion is not found, promotionId: %d", promotionId)
+	}
+
+	items, _ := app.itemApp.ListByCartId(cartId)
+	if len(items) > 0 {
+		cart = calcCartPricesWithPromotion(cart, items, promotion)
+		app.cartRepo.Update(cart)
 	}
 
 	cart.AppliedPromotionId = promotion.Id
-
 	_, err = app.cartRepo.Update(cart)
 	if err != nil {
-		return fmt.Errorf("failed to apply promotion: %v", err)
+		slog.Error("Failed to apply promotion. Error: ", err)
+		return nil, fmt.Errorf("failed to apply promotion, cartId: %d, promotionId: %d", cartId, promotionId)
 	}
 
-	return nil
+	return cart, nil
 }
 
-// TODO: Aggregate veya DTO ile değiştir...
-func (app *cartApp) Display(cartId int) (entity.Cart, error) {
-	return app.cartRepo.GetByID(cartId)
+func calcCartPricesWithPromotion(cart *entity.Cart, items []*entity.Item, promotion *entity.Promotion) *entity.Cart {
+	totalDiscount := float64(0)
+	firstSellerID := items[0].SellerID
+
+	for _, item := range items {
+		if promotion.PromotionType == entity.CategoryPromotion && item.CategoryID == promotion.CategoryP.CategoryID {
+			itemDiscount := item.Price * (float64(promotion.CategoryP.DiscountRate) / 100)
+			totalDiscount += float64(item.Quantity) * itemDiscount
+		} else if promotion.PromotionType == entity.SameSellerPromotion {
+			if item.SellerID != firstSellerID {
+				break
+			}
+
+			itemDiscount := item.Price * (float64(promotion.SameSellerP.DiscountRate) / 100)
+			totalDiscount += float64(item.Quantity) * itemDiscount
+		}
+	}
+
+	if promotion.PromotionType == entity.TotalPricePromotion {
+		for _, rnge := range promotion.TotalPriceP {
+			if cart.TotalAmount >= rnge.PriceRangeStart && cart.TotalAmount <= rnge.PriceRangeEnd {
+				totalDiscount = rnge.DiscountAmount
+				break
+			}
+		}
+	}
+
+	cart.TotalDiscount = totalDiscount
+	cart.TotalAmount = cart.TotalPrice - totalDiscount
+
+	return cart
+}
+
+// TODO: Aggregate veya DTO ile değiştir... (veya DTO)
+func (app *cartApp) Display(cartId int) (*dto.DisplayCartDTO, error) {
+	cart, err := app.cartRepo.GetByID(cartId)
+	if err != nil {
+		return nil, fmt.Errorf("cart not found. CartID: %d", cartId)
+	}
+
+	items, itemErr := app.itemApp.ListByCartId(cartId)
+	if itemErr != nil {
+		return nil, fmt.Errorf("failed to retrieve cart items. Error: %v", itemErr)
+	}
+
+	var itemDTOs []*dto.ItemDTO
+	for _, item := range items {
+		vasItems, vasItemErr := app.vasItemApp.ListByItemId(item.Id)
+		if vasItemErr != nil {
+			return nil, fmt.Errorf("failed to retrieve vas items. Error: %v", vasItemErr)
+		}
+
+		itemDTOs = append(itemDTOs, &dto.ItemDTO{
+			ID:         item.Id,
+			CategoryID: item.CategoryID,
+			SellerID:   item.SellerID,
+			CartID:     item.CartID,
+			Price:      item.Price,
+			ItemType:   item.ItemType,
+			VasItems:   vasItems,
+		})
+	}
+
+	displayCartDTO := &dto.DisplayCartDTO{
+		ID:                 cart.Id,
+		TotalPrice:         cart.TotalPrice,
+		TotalDiscount:      cart.TotalDiscount,
+		TotalAmount:        cart.TotalAmount,
+		AppliedPromotionId: cart.AppliedPromotionId,
+		Items:              itemDTOs,
+	}
+
+	return displayCartDTO, nil
 }
 
 func (app *cartApp) ResetCart(cartId int) error {
@@ -91,4 +174,87 @@ func (app *cartApp) ResetCart(cartId int) error {
 	wg.Wait()
 
 	return nil
+}
+
+func (app *cartApp) AddItem(cartId int, item *entity.Item) (*entity.Item, error) {
+	cart, err := app.cartRepo.GetByID(cartId)
+	if cart == nil || err != nil {
+		cart = &entity.Cart{
+			Id: utils.GenerateID(),
+		}
+		_, err := app.cartRepo.Create(cart)
+		if err != nil {
+			return nil, fmt.Errorf("failed create cart error: %v", err)
+		}
+	}
+	item.CartID = cartId
+
+	itemValidateErr := item.Validate()
+	if itemValidateErr != nil {
+		return nil, fmt.Errorf("failed to add item: %v", itemValidateErr)
+	}
+
+	err = app.itemApp.Create(item)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add item: %v", err)
+	}
+
+	_, updCartErr := app.UpdateCartPriceAndQuantity(cartId)
+	if updCartErr != nil {
+		app.itemApp.Delete(item.Id) // * Rollback
+		slog.Error("Failed to update cart price and quantity. Error: ", updCartErr)
+		return nil, fmt.Errorf("failed to update cart price and quantity. Error: %v", updCartErr)
+	}
+
+	return item, nil
+}
+
+func (app *cartApp) UpdateCartPriceAndQuantity(cartId int) (cart *entity.Cart, err error) {
+	cart, err = app.cartRepo.GetByID(cartId)
+	if err != nil {
+		return nil, fmt.Errorf("cart not found. CartID: %d", cartId)
+	}
+
+	items, listItemsErr := app.itemApp.ListByCartId(cartId)
+	if listItemsErr != nil {
+		return nil, fmt.Errorf("list items error: %v", listItemsErr)
+	}
+
+	var totalPrice float64
+	var totalQuantity int
+
+	for _, item := range items {
+		totalQuantity += item.Quantity
+		totalPrice += item.Price * float64(item.Quantity)
+		vasItems, listVasItemErr := app.vasItemApp.ListByItemId(item.Id)
+		if len(vasItems) > 0 && listVasItemErr == nil {
+			for _, vasItem := range vasItems {
+				totalPrice += vasItem.Price * float64(vasItem.Quantity)
+			}
+		}
+	}
+
+	if totalQuantity > 30 {
+		return nil, fmt.Errorf("total quantity can not be more than 30. Total Quantity: %d", totalQuantity)
+	}
+
+	if cart.AppliedPromotionId != 0 {
+		promotion, getPromErr := app.promotionApp.GetById(cart.AppliedPromotionId)
+		if getPromErr != nil {
+			return nil, fmt.Errorf("get promotion error: %v", getPromErr)
+		}
+		cart = calcCartPricesWithPromotion(cart, items, promotion)
+	}
+
+	if cart.TotalAmount > 500000 {
+		return nil, fmt.Errorf("total amount can not be more than 500000. Total Amount: %f", cart.TotalAmount)
+	}
+
+	cart.TotalPrice = totalPrice
+	_, err = app.cartRepo.Update(cart)
+	if err != nil {
+		return nil, fmt.Errorf("update cart error: %v", err)
+	}
+
+	return cart, nil
 }

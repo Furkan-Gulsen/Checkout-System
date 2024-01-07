@@ -77,6 +77,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/cart/{cartId}/item": {
+            "post": {
+                "description": "Add an item to a cart",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Cart ID",
+                        "name": "cartId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Item",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ItemCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item added successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/cart/{cartId}/promotion/{promotionId}": {
             "post": {
                 "description": "Apply a promotion to a cart",
@@ -136,13 +177,13 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Category"
+                            "$ref": "#/definitions/dto.CategoryRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Category created successfully",
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
@@ -195,40 +236,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/item": {
-            "post": {
-                "description": "Create a new item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Item"
-                ],
-                "summary": "Create an item",
-                "parameters": [
-                    {
-                        "description": "Item object",
-                        "name": "item",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.Item"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Item created successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -314,38 +321,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Delete an item by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Item"
-                ],
-                "summary": "Delete an item by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int",
-                        "description": "Item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
             }
         },
         "/api/v1/promotion": {
@@ -368,7 +343,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Promotion"
+                            "$ref": "#/definitions/dto.PromotionRequest"
                         }
                     }
                 ],
@@ -564,6 +539,60 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.CategoryRequest": {
+            "type": "object",
+            "properties": {
+                "itemType": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ItemCreateRequest": {
+            "type": "object",
+            "properties": {
+                "cartId": {
+                    "type": "integer"
+                },
+                "categoryId": {
+                    "type": "integer"
+                },
+                "itemType": {
+                    "$ref": "#/definitions/entity.ItemType"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "sellerId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.PromotionRequest": {
+            "type": "object",
+            "properties": {
+                "categoryPromotion": {
+                    "$ref": "#/definitions/entity.CategoryPromotionDiscount"
+                },
+                "promotionType": {
+                    "type": "integer"
+                },
+                "sameSellerPromotion": {
+                    "$ref": "#/definitions/entity.SameSellerPromotionDiscount"
+                },
+                "totalPricePromotions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.TotalPricePromotionDiscount"
+                    }
+                }
+            }
+        },
         "entity.Category": {
             "type": "object",
             "required": [
@@ -575,10 +604,14 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "itemType": {
-                    "type": "integer",
                     "enum": [
                         1,
                         2
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.ItemType"
+                        }
                     ]
                 },
                 "name": {
@@ -623,7 +656,15 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "itemType": {
-                    "type": "integer"
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.ItemType"
+                        }
+                    ]
                 },
                 "price": {
                     "type": "number"
@@ -636,6 +677,17 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "entity.ItemType": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "DigitalItem",
+                "DefaultItem"
+            ]
         },
         "entity.Promotion": {
             "type": "object",
@@ -677,16 +729,12 @@ const docTemplate = `{
             "enum": [
                 1,
                 2,
-                3,
-                1,
-                2
+                3
             ],
             "x-enum-varnames": [
                 "SameSellerPromotion",
                 "CategoryPromotion",
-                "TotalPricePromotion",
-                "DigitalItem",
-                "DefaultItem"
+                "TotalPricePromotion"
             ]
         },
         "entity.SameSellerPromotionDiscount": {
