@@ -43,17 +43,17 @@ func (h *CategoryHandler) List(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param category body entity.Category true "Category object"
-// @Success 200 {string} string "Category created successfully"
+// @Success 200 {object} string
 // @Router /api/v1/category [post]
 func (h *CategoryHandler) Create(c *gin.Context) {
-	var category entity.Category
+	var data entity.Category
 
-	if err := c.ShouldBindJSON(&category); err != nil {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(400, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
-	err := category.Validate()
+	err := data.Validate()
 	if err != nil {
 		c.JSON(400, gin.H{
 			"status":  false,
@@ -62,12 +62,13 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.categoryApp.Create(category); err != nil {
+	category, createErr := h.categoryApp.Create(&data)
+	if createErr != nil {
 		c.JSON(500, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"status": true, "message": "Category created successfully"})
+	c.JSON(200, gin.H{"status": true, "message": "Category created successfully", "data": category})
 }
 
 // @Summary Get a category by ID

@@ -18,19 +18,19 @@ func NewCategoryApp(categoryRepo repository.CategoryRepositoryI) *categoryApp {
 }
 
 type CategoryAppInterface interface {
-	List() ([]entity.Category, error)
-	Create(entity.Category) error
-	GetByID(id int) (entity.Category, error)
+	List() ([]*entity.Category, error)
+	Create(category *entity.Category) (*entity.Category, error)
+	GetByID(id int) (*entity.Category, error)
 }
 
-func (app *categoryApp) List() ([]entity.Category, error) {
+func (app *categoryApp) List() ([]*entity.Category, error) {
 	return app.categoryRepo.List()
 }
 
-func (app *categoryApp) Create(category entity.Category) error {
+func (app *categoryApp) Create(category *entity.Category) (*entity.Category, error) {
 	return app.categoryRepo.Create(category)
 }
 
-func (app *categoryApp) GetByID(id int) (entity.Category, error) {
+func (app *categoryApp) GetByID(id int) (*entity.Category, error) {
 	return app.categoryRepo.GetByID(id)
 }
