@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,7 +38,7 @@ func (m *mockItemRepository) Delete(id int) error {
 	return deleteItemRepo(id)
 }
 
-var ItemAppMock ItemAppInterface = &mockItemRepository{}
+var ItemAppMock repository.ItemRepositoryI = &mockItemRepository{}
 
 func TestSaveItem_Success(t *testing.T) {
 	createItemRepo = func(item *entity.Item) (*entity.Item, error) {
@@ -61,7 +62,8 @@ func TestSaveItem_Success(t *testing.T) {
 		ItemType:   entity.DefaultItem,
 	}
 
-	item, err := ItemAppMock.Create(item)
+	app := NewItemApp(ItemAppMock)
+	item, err := app.Create(item)
 	assert.Nil(t, err)
 	assert.Equal(t, 1111, item.Id)
 	assert.Equal(t, 1111, item.CategoryID)
@@ -86,7 +88,8 @@ func TestGetItemByID_Success(t *testing.T) {
 		}, nil
 	}
 
-	item, err := ItemAppMock.GetById(1111)
+	app := NewItemApp(ItemAppMock)
+	item, err := app.GetById(1111)
 	assert.Nil(t, err)
 	assert.Equal(t, 1111, item.Id)
 	assert.Equal(t, 1111, item.CategoryID)
@@ -102,7 +105,8 @@ func TestGetItemByID_Fail(t *testing.T) {
 		return nil, nil
 	}
 
-	item, err := ItemAppMock.GetById(1111)
+	app := NewItemApp(ItemAppMock)
+	item, err := app.GetById(1111)
 	assert.Nil(t, item)
 	assert.Nil(t, err)
 }
@@ -131,7 +135,8 @@ func TestListItemsByCartID_Success(t *testing.T) {
 		}, nil
 	}
 
-	items, err := ItemAppMock.ListByCartId(1111)
+	app := NewItemApp(ItemAppMock)
+	items, err := app.ListByCartId(1111)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(items))
 	assert.Equal(t, 1111, items[0].Id)
@@ -155,7 +160,8 @@ func TestListItemsByCartID_Fail(t *testing.T) {
 		return nil, nil
 	}
 
-	items, err := ItemAppMock.ListByCartId(1111)
+	app := NewItemApp(ItemAppMock)
+	items, err := app.ListByCartId(1111)
 	assert.Nil(t, items)
 	assert.Nil(t, err)
 }

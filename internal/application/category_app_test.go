@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +28,7 @@ func (m *mockCategoryRepository) GetByID(id int) (*entity.Category, error) {
 	return getByIDCategoryRepo(id)
 }
 
-var categoryAppMock CategoryAppInterface = &mockCategoryRepository{}
+var CategoryAppMock repository.CategoryRepositoryI = &mockCategoryRepository{}
 
 func TestSaveCategory_Success(t *testing.T) {
 	createCategoryRepo = func(category *entity.Category) (*entity.Category, error) {
@@ -42,7 +43,8 @@ func TestSaveCategory_Success(t *testing.T) {
 		Name: "Category1",
 	}
 
-	category, err := categoryAppMock.Create(category)
+	app := NewCategoryApp(CategoryAppMock)
+	category, err := app.Create(category)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, category.Id)
 	assert.Equal(t, "Category1", category.Name)
@@ -57,7 +59,8 @@ func TestGetCategoryByID_Success(t *testing.T) {
 		}, nil
 	}
 
-	category, err := categoryAppMock.GetByID(1)
+	app := NewCategoryApp(CategoryAppMock)
+	category, err := app.GetByID(1)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, category.Id)
 	assert.Equal(t, "Category1", category.Name)
@@ -68,7 +71,8 @@ func TestGetCategoryByID_Fail(t *testing.T) {
 		return nil, nil
 	}
 
-	category, err := categoryAppMock.GetByID(300)
+	app := NewCategoryApp(CategoryAppMock)
+	category, err := app.GetByID(300)
 	assert.Nil(t, category)
 	assert.Nil(t, err)
 }
@@ -87,7 +91,8 @@ func TestListCategory_Success(t *testing.T) {
 		}, nil
 	}
 
-	categories, err := categoryAppMock.List()
+	app := NewCategoryApp(CategoryAppMock)
+	categories, err := app.List()
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(categories))
 	assert.Equal(t, 1, categories[0].Id)
@@ -101,7 +106,8 @@ func TestListCategory_Fail(t *testing.T) {
 		return nil, nil
 	}
 
-	categories, err := categoryAppMock.List()
+	app := NewCategoryApp(CategoryAppMock)
+	categories, err := app.List()
 	assert.Nil(t, categories)
 	assert.Nil(t, err)
 }
@@ -111,7 +117,8 @@ func TestListCategory_Empty(t *testing.T) {
 		return []*entity.Category{}, nil
 	}
 
-	categories, err := categoryAppMock.List()
+	app := NewCategoryApp(CategoryAppMock)
+	categories, err := app.List()
 	assert.Nil(t, err)
 	assert.Equal(t, 0, len(categories))
 }

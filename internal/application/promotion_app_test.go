@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +28,7 @@ func (m *mockPromotionRepository) GetById(promotionID int) (*entity.Promotion, e
 	return getByIDPromotionRepo(promotionID)
 }
 
-var PromotionAppMock PromotionAppInterface = &mockPromotionRepository{}
+var PromotionAppMock repository.PromotionRepositoryI = &mockPromotionRepository{}
 
 func TestGetPromotionByID_Success(t *testing.T) {
 	getByIDPromotionRepo = func(id int) (*entity.Promotion, error) {
@@ -37,7 +38,8 @@ func TestGetPromotionByID_Success(t *testing.T) {
 		}, nil
 	}
 
-	promotion, err := PromotionAppMock.GetById(1)
+	app := NewPromotionApp(PromotionAppMock)
+	promotion, err := app.GetById(1)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, promotion.Id)
 	assert.Equal(t, entity.PromotionType(1), promotion.PromotionType)
@@ -57,7 +59,8 @@ func TestListPromotion_Success(t *testing.T) {
 		}, nil
 	}
 
-	promotions, err := PromotionAppMock.List()
+	app := NewPromotionApp(PromotionAppMock)
+	promotions, err := app.List()
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(promotions))
 	assert.Equal(t, 1, promotions[0].Id)
@@ -71,7 +74,8 @@ func TestListPromotion_Fail(t *testing.T) {
 		return nil, nil
 	}
 
-	promotions, err := PromotionAppMock.List()
+	app := NewPromotionApp(PromotionAppMock)
+	promotions, err := app.List()
 	assert.Nil(t, promotions)
 	assert.Nil(t, err)
 }
