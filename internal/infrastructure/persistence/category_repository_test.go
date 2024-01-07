@@ -1,49 +1,25 @@
 package persistence
 
 import (
-	"context"
 	"testing"
-	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/database"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/constants"
+	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
-var MOCK_DB_URL = "mongodb://localhost:27017"
-var MOCK_DB_NAME = "mock_ty_case"
-
-func setUpDatabase(t *testing.T) *database.Database {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	db, err := database.Connect(ctx, MOCK_DB_URL)
-	if err != nil {
-		t.Fatalf("Database connection error: %v", err)
-	}
-
-	return db
-}
-
-func createTestRepo(db *database.Database) *CategoryRepository {
-	return NewCategoryRepository(db, MOCK_DB_NAME)
-}
-
-func cleanUpDatabase(db *database.Database) {
-	db.Client.Database(MOCK_DB_NAME).Collection("categories").Drop(context.Background())
-}
-
-func setUp(t *testing.T) (*CategoryRepository, func()) {
-	db := setUpDatabase(t)
-	repo := createTestRepo(db)
+func setUpCategoryRepo(t *testing.T) (*CategoryRepository, func()) {
+	db := utils.SetUpMockDatabase(t)
+	repo := NewCategoryRepository(db, constants.MOCK_DB_NAME)
 
 	return repo, func() {
-		cleanUpDatabase(db)
+		utils.CleanUpMockDatabase(db, "categories")
 	}
 }
 
 func TestCreateCategory_Success(t *testing.T) {
-	repo, tearDown := setUp(t)
+	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
 	category := &entity.Category{
@@ -70,7 +46,7 @@ func TestCreateCategory_Failure(t *testing.T) {
 }
 
 func TestListCategory(t *testing.T) {
-	repo, tearDown := setUp(t)
+	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
 	_, _ = repo.Create(&entity.Category{Id: 1, Name: "Category1", ItemType: 1})
@@ -82,7 +58,7 @@ func TestListCategory(t *testing.T) {
 }
 
 func TestGetCategoryByID_Success(t *testing.T) {
-	repo, tearDown := setUp(t)
+	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
 	expectedCategory := &entity.Category{Id: 1, Name: "Category1", ItemType: 1}
@@ -97,7 +73,7 @@ func TestGetCategoryByID_Success(t *testing.T) {
 }
 
 func TestGetCategoryByID_NotFound(t *testing.T) {
-	repo, tearDown := setUp(t)
+	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
 	category, err := repo.GetByID(8488484848484)
@@ -106,7 +82,7 @@ func TestGetCategoryByID_NotFound(t *testing.T) {
 }
 
 func TestGetCategoryByID_InvalidID(t *testing.T) {
-	repo, tearDown := setUp(t)
+	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
 	category, err := repo.GetByID(0)
