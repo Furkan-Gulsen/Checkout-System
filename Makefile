@@ -19,3 +19,11 @@ dev:
 swag:
 	@echo "Generating swagger..."
 	swag init -g cmd/main.go -d ./
+
+up:
+	@echo "Running docker-compose..."
+	docker-compose up -d --build
+
+down:
+	@echo "Stopping docker-compose..."
+	docker-compose down
