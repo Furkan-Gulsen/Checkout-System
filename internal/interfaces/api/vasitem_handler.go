@@ -54,7 +54,8 @@ func (h *VasItemHandler) ListByItemId(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status":  true,
-		"message": vasItems,
+		"message": "Vas items found",
+		"data":    vasItems,
 	})
 }
 
@@ -93,7 +94,8 @@ func (h *VasItemHandler) GetById(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status":  true,
-		"message": vasItem,
+		"message": "Vas item found",
+		"data":    vasItem,
 	})
 }
 

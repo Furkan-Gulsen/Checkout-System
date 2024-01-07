@@ -33,7 +33,8 @@ func (h *PromotionHandler) List(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status":  true,
-		"message": promotions,
+		"message": "Promotions listed successfully",
+		"data":    promotions,
 	})
 }
 
@@ -104,6 +105,7 @@ func (h *PromotionHandler) GetById(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status":  true,
-		"message": promotion,
+		"message": "Promotion found",
+		"data":    promotion,
 	})
 }

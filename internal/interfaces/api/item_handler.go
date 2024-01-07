@@ -53,7 +53,8 @@ func (h *ItemHandler) ListByCartId(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status":  true,
-		"message": items,
+		"message": "Items found",
+		"data":    items,
 	})
 }
 
@@ -120,5 +121,5 @@ func (h *ItemHandler) GetById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"message": item, "status": true})
+	c.JSON(200, gin.H{"status": true, "message": "Item found", "data": item})
 }

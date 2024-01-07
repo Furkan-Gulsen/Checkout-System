@@ -100,6 +100,7 @@ func (h *CategoryHandler) GetById(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"status":  true,
-		"message": category,
+		"message": "Category found",
+		"data":    category,
 	})
 }
