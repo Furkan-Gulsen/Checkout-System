@@ -35,6 +35,9 @@ func TestGetPromotionByID_Success(t *testing.T) {
 		return &entity.Promotion{
 			Id:            1,
 			PromotionType: entity.PromotionType(1),
+			SameSellerP: &entity.SameSellerPromotionDiscount{
+				DiscountRate: 10,
+			},
 		}, nil
 	}
 
