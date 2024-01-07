@@ -103,24 +103,26 @@ func (h *VasItemHandler) GetById(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param vas_item body entity.VasItem true "Vas Item object"
-// @Success 200 {string} string "Vas Item created successfully"
+// @Success 200 {object} []entity.VasItem
 // @Router /api/v1/vasitem [post]
 func (h *VasItemHandler) Create(c *gin.Context) {
-	var vasItem entity.VasItem
+	var vasItem *entity.VasItem
 
 	if err := c.ShouldBindJSON(&vasItem); err != nil {
 		c.JSON(400, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
-	if err := h.vasItemApp.Create(&vasItem); err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+	vasItem, createErr := h.vasItemApp.Create(vasItem)
+	if createErr != nil {
+		c.JSON(500, gin.H{"status": false, "message": createErr.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"status":  true,
 		"message": "Vas Item created successfully",
+		"data":    vasItem,
 	})
 }
 

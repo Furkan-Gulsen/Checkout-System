@@ -90,9 +90,9 @@ func translateValidationErrors(err error) error {
 		case "required":
 			return fmt.Errorf("%s is required", validationErr.StructField())
 		case "min":
-			return fmt.Errorf("%s must be greater than or equal to 0", validationErr.StructField())
+			return fmt.Errorf("quantity must be greater than or equal to 0")
 		case "max":
-			return fmt.Errorf("%s must be less than or equal to 100", validationErr.StructField())
+			return fmt.Errorf("quantity must be less than or equal to 100")
 		}
 	}
 	return err

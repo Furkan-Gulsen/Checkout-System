@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
@@ -58,7 +59,7 @@ func (r *VasItemRepository) GetById(vasItemId int) (*entity.VasItem, error) {
 	return vasItem, nil
 }
 
-func (r *VasItemRepository) Create(vasItem *entity.VasItem) error {
+func (r *VasItemRepository) Create(vasItem *entity.VasItem) (*entity.VasItem, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -66,10 +67,10 @@ func (r *VasItemRepository) Create(vasItem *entity.VasItem) error {
 
 	_, err := r.collection.InsertOne(ctx, vasItem)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error while creating vas item: %v", err)
 	}
 
-	return nil
+	return vasItem, nil
 }
 
 func (r *VasItemRepository) DeleteById(vasItemId int) error {

@@ -454,9 +454,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: Vas Item created successfully
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/entity.VasItem'
+            type: array
       summary: Create a vas item
       tags:
       - VasItem

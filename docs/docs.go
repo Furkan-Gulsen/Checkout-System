@@ -435,9 +435,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Vas Item created successfully",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.VasItem"
+                            }
                         }
                     }
                 }
