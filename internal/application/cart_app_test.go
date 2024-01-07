@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
@@ -68,6 +69,9 @@ func TestAllForCart(t *testing.T) {
 	})
 	t.Run("TestResetCart", func(t *testing.T) {
 		resetCart(t)
+	})
+	t.Run("TestDisplayCart", func(t *testing.T) {
+		displayCart(t)
 	})
 }
 
@@ -148,14 +152,14 @@ func saveCartToUncreatedCart_Success(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(1111, item)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(4020), cart.TotalAmount)
-	// assert.Equal(t, float64(4020), cart.TotalPrice)
-	// assert.Equal(t, float64(0), cart.TotalDiscount)
-	// assert.Equal(t, 0, cart.AppliedPromotionId)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(1111, item)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(4020), cart.TotalAmount)
+	assert.Equal(t, float64(4020), cart.TotalPrice)
+	assert.Equal(t, float64(0), cart.TotalDiscount)
+	assert.Equal(t, 0, cart.AppliedPromotionId)
 
 }
 
@@ -194,15 +198,14 @@ func saveCartToCreatedCart_Success(t *testing.T) {
 		return []*entity.VasItem{}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(1111, item)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(500), cart.TotalAmount)
-	// assert.Equal(t, float64(500), cart.TotalPrice)
-	// assert.Equal(t, float64(0), cart.TotalDiscount)
-	// assert.Equal(t, 0, cart.AppliedPromotionId)
-	// fmt.Println("1003. TotalAmount: ", cart.TotalAmount)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(1111, item)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(500), cart.TotalAmount)
+	assert.Equal(t, float64(500), cart.TotalPrice)
+	assert.Equal(t, float64(0), cart.TotalDiscount)
+	assert.Equal(t, 0, cart.AppliedPromotionId)
 }
 
 // * Testing of a maximum of 30 products in the cart
@@ -233,11 +236,11 @@ func addItemToCart_Fail(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(5463, item)
-	// assert.Nil(t, cart)
-	// assert.NotNil(t, err)
-	// assert.Equal(t, "failed to add item: Validation errors: Quantity max value is 10.", err.Error())
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(5463, item)
+	assert.Nil(t, cart)
+	assert.NotNil(t, err)
+	assert.Equal(t, "failed to add item: Validation errors: Quantity max value is 10.", err.Error())
 }
 
 // * Test of Adding Items to a Created Cart with SameSellerPromotion [Applied]
@@ -268,14 +271,14 @@ func addingItemsToCartWithPromotion_Success(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(5001, item)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(400), cart.TotalAmount)
-	// assert.Equal(t, float64(500), cart.TotalPrice)
-	// assert.Equal(t, float64(100), cart.TotalDiscount)
-	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(5001, item)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(400), cart.TotalAmount)
+	assert.Equal(t, float64(500), cart.TotalPrice)
+	assert.Equal(t, float64(100), cart.TotalDiscount)
+	assert.Equal(t, 1234, cart.AppliedPromotionId)
 }
 
 // * Test of Adding Items to a Created Cart with SameSellerPromotion [Not Applied]
@@ -305,14 +308,14 @@ func addingItemsToCartWithPromotion_NotApplied(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(5002, item)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(1000), cart.TotalAmount)
-	// assert.Equal(t, float64(1000), cart.TotalPrice)
-	// assert.Equal(t, float64(0), cart.TotalDiscount)
-	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(5002, item)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(1000), cart.TotalAmount)
+	assert.Equal(t, float64(1000), cart.TotalPrice)
+	assert.Equal(t, float64(0), cart.TotalDiscount)
+	assert.Equal(t, 1234, cart.AppliedPromotionId)
 }
 
 // * Test of Adding Items to a Created Cart with CategoryPromotion [Applied]
@@ -371,13 +374,13 @@ func addingItemsToCartWithCategoryPromotion_Success(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(5003, item)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(1800), cart.TotalAmount)
-	// assert.Equal(t, float64(2000), cart.TotalPrice)
-	// assert.Equal(t, float64(200), cart.TotalDiscount)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(5003, item)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(1800), cart.TotalAmount)
+	assert.Equal(t, float64(2000), cart.TotalPrice)
+	assert.Equal(t, float64(200), cart.TotalDiscount)
 }
 
 // * Test of Adding Items to a Created Cart with TotalPricePromotion [Applied]
@@ -430,13 +433,13 @@ func addingItemsToCartWithTotalPricePromotion_Success(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.AddItem(5007, item)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(1400), cart.TotalAmount)
-	// assert.Equal(t, float64(1500), cart.TotalPrice)
-	// assert.Equal(t, float64(100), cart.TotalDiscount)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddItem(5007, item)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(1400), cart.TotalAmount)
+	assert.Equal(t, float64(1500), cart.TotalPrice)
+	assert.Equal(t, float64(100), cart.TotalDiscount)
 }
 
 func applySameSellerPromotion(t *testing.T) {
@@ -486,14 +489,14 @@ func applySameSellerPromotion(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.ApplyPromotion(cartId, promotionId)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(500), cart.TotalAmount)
-	// assert.Equal(t, float64(1000), cart.TotalPrice)
-	// assert.Equal(t, float64(500), cart.TotalDiscount)
-	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.ApplyPromotion(cartId, promotionId)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(500), cart.TotalAmount)
+	assert.Equal(t, float64(1000), cart.TotalPrice)
+	assert.Equal(t, float64(500), cart.TotalDiscount)
+	assert.Equal(t, 1234, cart.AppliedPromotionId)
 }
 
 func applyCategoryPromotion(t *testing.T) {
@@ -545,14 +548,14 @@ func applyCategoryPromotion(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.ApplyPromotion(cartId, promotionId)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(750), cart.TotalAmount)
-	// assert.Equal(t, float64(1000), cart.TotalPrice)
-	// assert.Equal(t, float64(250), cart.TotalDiscount)
-	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.ApplyPromotion(cartId, promotionId)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(750), cart.TotalAmount)
+	assert.Equal(t, float64(1000), cart.TotalPrice)
+	assert.Equal(t, float64(250), cart.TotalDiscount)
+	assert.Equal(t, 1234, cart.AppliedPromotionId)
 }
 
 func applyTotalPricePromotion(t *testing.T) {
@@ -607,14 +610,14 @@ func applyTotalPricePromotion(t *testing.T) {
 		}, nil
 	}
 
-	// app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
-	// cart, err := app.ApplyPromotion(cartId, promotionId)
-	// assert.Nil(t, err)
-	// assert.NotNil(t, cart)
-	// assert.Equal(t, float64(1300), cart.TotalAmount)
-	// assert.Equal(t, float64(1500), cart.TotalPrice)
-	// assert.Equal(t, float64(200), cart.TotalDiscount)
-	// assert.Equal(t, 1234, cart.AppliedPromotionId)
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.ApplyPromotion(cartId, promotionId)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(1300), cart.TotalAmount)
+	assert.Equal(t, float64(1500), cart.TotalPrice)
+	assert.Equal(t, float64(200), cart.TotalDiscount)
+	assert.Equal(t, 1234, cart.AppliedPromotionId)
 }
 
 func resetCart(t *testing.T) {
@@ -695,4 +698,67 @@ func resetCart(t *testing.T) {
 	assert.Equal(t, float64(0), cart.TotalAmount)
 	assert.Equal(t, float64(0), cart.TotalPrice)
 	assert.Equal(t, float64(0), cart.TotalDiscount)
+}
+
+func displayCart(t *testing.T) {
+	const cartId = 1505
+
+	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        1400,
+			TotalPrice:         1400,
+			TotalDiscount:      0,
+			AppliedPromotionId: 0,
+		}, nil
+	}
+
+	listItemRepo = func(id int) ([]*entity.Item, error) {
+		return []*entity.Item{
+			{
+				Id:         5001,
+				CategoryID: 1001,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+			{
+				Id:         5002,
+				CategoryID: 1004,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+		}, nil
+	}
+
+	listVasItemRepo = func(itemId int) ([]*entity.VasItem, error) {
+		return []*entity.VasItem{
+			{
+				Id:         3456,
+				CategoryId: 3242,
+				ItemId:     2222,
+				SellerId:   5003,
+				Price:      200,
+				Quantity:   2,
+			},
+		}, nil
+	}
+
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.Display(cartId)
+	fmt.Println("items: ", cart.Items)
+	for _, item := range cart.Items {
+		fmt.Println("vasItems: ", item.VasItems)
+	}
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(1400), cart.TotalAmount)
+	assert.Equal(t, float64(1400), cart.TotalPrice)
+	assert.Equal(t, float64(0), cart.TotalDiscount)
+	assert.Equal(t, 0, cart.AppliedPromotionId)
 }

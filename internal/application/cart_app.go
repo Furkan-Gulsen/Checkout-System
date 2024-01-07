@@ -30,11 +30,11 @@ func NewCartApp(cartRepo repository.CartRepositoryI, itemApp ItemAppInterface, v
 }
 
 type CartAppInterface interface {
-	ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) // OK
+	ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error)
 	Display(cartId int) (*dto.DisplayCartDTO, error)
-	ResetCart(cartId int) (*entity.Cart, error)                         // OK
-	AddItem(cartId int, item *entity.Item) (*entity.Cart, error)        // OK
-	UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart, error) // OK
+	ResetCart(cartId int) (*entity.Cart, error)
+	AddItem(cartId int, item *entity.Item) (*entity.Cart, error)
+	UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart, error)
 }
 
 func (app *cartApp) ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) {
@@ -71,7 +71,6 @@ func (app *cartApp) ApplyPromotion(cartId int, promotionId int) (*entity.Cart, e
 }
 
 func calcCartPricesWithPromotion(cart *entity.Cart, items []*entity.Item, promotion *entity.Promotion) *entity.Cart {
-	fmt.Println("-------------------------------------")
 	totalDiscount := float64(0)
 	firstSellerID := items[0].SellerID
 	sameSeller := true
@@ -94,10 +93,8 @@ func calcCartPricesWithPromotion(cart *entity.Cart, items []*entity.Item, promot
 
 	if promotion.PromotionType == entity.TotalPricePromotion {
 		for _, rnge := range promotion.TotalPriceP {
-			fmt.Println("cart.TotalAmount: ", cart.TotalAmount)
 			if cart.TotalPrice >= rnge.PriceRangeStart && cart.TotalPrice <= rnge.PriceRangeEnd {
 				totalDiscount = rnge.DiscountAmount
-				fmt.Println("totalDiscount: ", totalDiscount)
 				break
 			}
 		}
@@ -105,11 +102,9 @@ func calcCartPricesWithPromotion(cart *entity.Cart, items []*entity.Item, promot
 		totalDiscount = sameSellerTotalDiscount
 	}
 
-	fmt.Println("* totalDiscount: ", totalDiscount)
 	cart.TotalDiscount = totalDiscount
 	cart.TotalAmount = cart.TotalPrice - totalDiscount
 
-	fmt.Println("-------------------------------------")
 	return cart
 }
 
@@ -238,30 +233,18 @@ func (app *cartApp) UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart,
 	var totalQuantity int
 
 	for _, item := range items {
-		// fmt.Println("ID: ", item.Id)
 		totalQuantity += item.Quantity
 		totalPrice += item.Price * float64(item.Quantity)
-		// fmt.Println("totalPrice: ", totalPrice)
-		// fmt.Println("totalQuantity: ", totalQuantity)
 		vasItems, listVasItemErr := app.vasItemApp.ListByItemId(item.Id)
 		if len(vasItems) > 0 && listVasItemErr == nil {
 			for _, vasItem := range vasItems {
 				totalPrice += vasItem.Price * float64(vasItem.Quantity)
-				// fmt.Println("--------------------")
-				// fmt.Println("vasItem_price: ", vasItem.Price)
-				// fmt.Println("vasItem_quantity: ", vasItem.Quantity)
-				// fmt.Println("vasItem_totalPrice: ", vasItem.Price*float64(vasItem.Quantity))
-				// fmt.Println("totalPrice: ", totalPrice)
-				// fmt.Println("--------------------")
 			}
 		}
 
-		// fmt.Println("..............................")
 	}
 
 	cart.TotalPrice = totalPrice
-	fmt.Println("2. totalPrice: ", totalPrice)
-	fmt.Println("2. totalQuantity: ", totalQuantity)
 
 	if totalQuantity > 30 {
 		return nil, fmt.Errorf("total quantity can not be more than 30. Total Quantity: %d", totalQuantity)
@@ -273,10 +256,6 @@ func (app *cartApp) UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart,
 			return nil, fmt.Errorf("get promotion error: %v", getPromErr)
 		}
 		cart = calcCartPricesWithPromotion(cart, items, promotion)
-		fmt.Println("1 TotalAmount: ", cart.TotalAmount)
-		fmt.Println("1 TotalDiscount: ", cart.TotalDiscount)
-		fmt.Println("1 TotalPrice: ", cart.TotalPrice)
-		fmt.Println("1 AppliedPromotionId: ", cart.AppliedPromotionId)
 	} else {
 		cart.TotalAmount = totalPrice
 		cart.TotalDiscount = 0
