@@ -32,7 +32,7 @@ func NewCartApp(cartRepo repository.CartRepositoryI, itemApp ItemAppInterface, v
 type CartAppInterface interface {
 	ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) // OK
 	Display(cartId int) (*dto.DisplayCartDTO, error)
-	ResetCart(cartId int) error
+	ResetCart(cartId int) (*entity.Cart, error)                         // OK
 	AddItem(cartId int, item *entity.Item) (*entity.Cart, error)        // OK
 	UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart, error) // OK
 }
@@ -154,15 +154,20 @@ func (app *cartApp) Display(cartId int) (*dto.DisplayCartDTO, error) {
 	return displayCartDTO, nil
 }
 
-func (app *cartApp) ResetCart(cartId int) error {
-	err := app.cartRepo.Delete(cartId)
+func (app *cartApp) ResetCart(cartId int) (*entity.Cart, error) {
+	cart, err := app.cartRepo.GetByID(cartId)
 	if err != nil {
-		return fmt.Errorf("failed to reset cart: %v", err)
+		return nil, fmt.Errorf("failed to reset cart: %v", err)
+	}
+
+	err = app.cartRepo.Delete(cartId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to reset cart: %v", err)
 	}
 
 	items, err := app.itemApp.ListByCartId(cartId)
 	if err != nil {
-		return fmt.Errorf("failed to reset cart: %v", err)
+		return nil, fmt.Errorf("failed to reset cart: %v", err)
 	}
 
 	var wg sync.WaitGroup
@@ -180,7 +185,14 @@ func (app *cartApp) ResetCart(cartId int) error {
 	}
 	wg.Wait()
 
-	return nil
+	cart.TotalAmount = 0
+	cart.TotalDiscount = 0
+	cart.TotalPrice = 0
+	cart.AppliedPromotionId = 0
+	app.cartRepo.Update(cart)
+	// TODO: Rollback if any error occurs
+
+	return cart, nil
 }
 
 func (app *cartApp) AddItem(cartId int, item *entity.Item) (*entity.Cart, error) {

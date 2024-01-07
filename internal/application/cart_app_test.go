@@ -5,6 +5,7 @@ import (
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
+	"github.com/stretchr/testify/assert"
 )
 
 type mockCartRepository struct{}
@@ -64,6 +65,9 @@ func TestAllForCart(t *testing.T) {
 	})
 	t.Run("TestApplyTotalPricePromotion", func(t *testing.T) {
 		applyTotalPricePromotion(t)
+	})
+	t.Run("TestResetCart", func(t *testing.T) {
+		resetCart(t)
 	})
 }
 
@@ -613,37 +617,82 @@ func applyTotalPricePromotion(t *testing.T) {
 	// assert.Equal(t, 1234, cart.AppliedPromotionId)
 }
 
-// func ResetCart(t *testing.T) {
-// 	getByIDCartRepo = func(id int) (*entity.Cart, error) {
-// 		return &entity.Cart{
-// 			Id:                 1501,
-// 			TotalAmount:        0,
-// 			TotalPrice:         0,
-// 			TotalDiscount:      0,
-// 			AppliedPromotionId: 0,
-// 		}, nil
-// 	}
+func resetCart(t *testing.T) {
+	const cartId = 1505
 
-// 	updateCartRepo = func(cart *entity.Cart) (*entity.Cart, error) {
-// 		return &entity.Cart{
-// 			Id:                 1501,
-// 			TotalAmount:        0,
-// 			TotalPrice:         0,
-// 			TotalDiscount:      0,
-// 			AppliedPromotionId: 0,
-// 		}, nil
-// 	}
+	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        1400,
+			TotalPrice:         1400,
+			TotalDiscount:      0,
+			AppliedPromotionId: 0,
+		}, nil
+	}
 
-// 	deleteItemRepo = func(id int) error {
-// 		return nil
-// 	}
+	listItemRepo = func(id int) ([]*entity.Item, error) {
+		return []*entity.Item{
+			{
+				Id:         5001,
+				CategoryID: 1001,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+			{
+				Id:         5002,
+				CategoryID: 1004,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+		}, nil
+	}
 
-// 	deleteVasItemRepo = func(id int) error {
-// 		return nil
-// 	}
+	listVasItemRepo = func(itemId int) ([]*entity.VasItem, error) {
+		return []*entity.VasItem{
+			{
+				Id:         3456,
+				CategoryId: 3242,
+				ItemId:     2222,
+				SellerId:   5003,
+				Price:      200,
+				Quantity:   2,
+			},
+		}, nil
+	}
 
-// 	deleteCartRepo = func(id int) error {
-// 		return nil
-// 	}
+	updateCartRepo = func(cart *entity.Cart) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        0,
+			TotalPrice:         0,
+			TotalDiscount:      0,
+			AppliedPromotionId: 0,
+		}, nil
+	}
 
-// }
+	deleteItemRepo = func(id int) error {
+		return nil
+	}
+
+	deleteVasItemRepo = func(id int) error {
+		return nil
+	}
+
+	deleteCartRepo = func(id int) error {
+		return nil
+	}
+
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.ResetCart(cartId)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(0), cart.TotalAmount)
+	assert.Equal(t, float64(0), cart.TotalPrice)
+	assert.Equal(t, float64(0), cart.TotalDiscount)
+}
