@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/application"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/dto"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,18 +42,19 @@ func (h *CategoryHandler) List(c *gin.Context) {
 // @Tags Category
 // @Accept json
 // @Produce json
-// @Param category body entity.Category true "Category object"
+// @Param category body dto.CategoryRequest true "Category object"
 // @Success 200 {object} string
 // @Router /api/v1/category [post]
 func (h *CategoryHandler) Create(c *gin.Context) {
-	var data entity.Category
+	var data dto.CategoryRequest
 
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(400, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
-	err := data.Validate()
+	dataEntity := data.ToEntity()
+	err := dataEntity.Validate()
 	if err != nil {
 		c.JSON(400, gin.H{
 			"status":  false,
@@ -62,7 +63,7 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 		return
 	}
 
-	category, createErr := h.categoryApp.Create(&data)
+	category, createErr := h.categoryApp.Create(&dataEntity)
 	if createErr != nil {
 		c.JSON(500, gin.H{"status": false, "message": err.Error()})
 		return
