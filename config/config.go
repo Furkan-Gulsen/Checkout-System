@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -25,7 +26,14 @@ type (
 )
 
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("config")
+	env := os.Getenv("APP_ENV")
+	if env == "docker" {
+		viper.SetConfigName("docker-config")
+	} else {
+		viper.SetConfigName("config")
+	}
+
+	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config")
 	viper.AddConfigPath(".")
 
