@@ -45,7 +45,7 @@ func (r *ItemRepository) ListByCartId(cartId int) ([]*entity.Item, error) {
 	return items, nil
 }
 
-func (r *ItemRepository) Create(item *entity.Item) error {
+func (r *ItemRepository) Create(item *entity.Item) (*entity.Item, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -53,10 +53,10 @@ func (r *ItemRepository) Create(item *entity.Item) error {
 
 	_, err := r.collection.InsertOne(ctx, item)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("could not create item: %w", err)
 	}
 
-	return nil
+	return item, nil
 }
 
 func (r *ItemRepository) GetById(itemID int) (*entity.Item, error) {
@@ -67,7 +67,7 @@ func (r *ItemRepository) GetById(itemID int) (*entity.Item, error) {
 
 	err := r.collection.FindOne(ctx, bson.M{"_id": itemID}).Decode(&item)
 	if err != nil {
-		return &entity.Item{}, fmt.Errorf("could not find item with id %d: %w", itemID, err)
+		return nil, fmt.Errorf("could not find item with id %d: %w", itemID, err)
 	}
 
 	return &item, nil

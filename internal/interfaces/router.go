@@ -19,7 +19,7 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	// * Application Layer
 	categoryApp := application.NewCategoryApp(repositories.Category)
 	promotionApp := application.NewPromotionApp(repositories.Promotion)
-	itemApp := application.NewItemApp(repositories.Item, categoryApp)
+	itemApp := application.NewItemApp(repositories.Item)
 	vasitemApp := application.NewVasItemApp(repositories.VasItem, categoryApp, itemApp)
 	cartApp := application.NewCartApp(repositories.Cart, itemApp, vasitemApp, promotionApp)
 
