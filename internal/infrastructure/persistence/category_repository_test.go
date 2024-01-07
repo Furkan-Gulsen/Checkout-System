@@ -23,9 +23,8 @@ func TestCreateCategory_Success(t *testing.T) {
 	defer tearDown()
 
 	category := &entity.Category{
-		Id:       1,
-		Name:     "Category1",
-		ItemType: 1,
+		Id:   1,
+		Name: "Category1",
 	}
 
 	category, err := repo.Create(category)
@@ -33,24 +32,12 @@ func TestCreateCategory_Success(t *testing.T) {
 	assert.NotNil(t, category)
 }
 
-func TestCreateCategory_Failure(t *testing.T) {
-	category := &entity.Category{
-		Id:       1,
-		Name:     "",
-		ItemType: 4,
-	}
-
-	err := category.Validate()
-	assert.NotNil(t, err)
-	assert.EqualError(t, err, "Validation errors: Name is required. ItemType must be 1 or 2.")
-}
-
 func TestListCategory(t *testing.T) {
 	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
-	_, _ = repo.Create(&entity.Category{Id: 1, Name: "Category1", ItemType: 1})
-	_, _ = repo.Create(&entity.Category{Id: 2, Name: "Category2", ItemType: 2})
+	_, _ = repo.Create(&entity.Category{Id: 1, Name: "Category1"})
+	_, _ = repo.Create(&entity.Category{Id: 2, Name: "Category2"})
 
 	categories, err := repo.List()
 	assert.Nil(t, err)
@@ -61,7 +48,7 @@ func TestGetCategoryByID_Success(t *testing.T) {
 	repo, tearDown := setUpCategoryRepo(t)
 	defer tearDown()
 
-	expectedCategory := &entity.Category{Id: 1, Name: "Category1", ItemType: 1}
+	expectedCategory := &entity.Category{Id: 1, Name: "Category1"}
 	category, err := repo.Create(expectedCategory)
 
 	assert.Nil(t, err)

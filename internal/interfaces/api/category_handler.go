@@ -27,12 +27,11 @@ func NewCategoryHandler(categoryApp application.CategoryAppInterface) *CategoryH
 func (h *CategoryHandler) List(c *gin.Context) {
 	categories, err := h.categoryApp.List()
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": categories,
 	})
 }
@@ -49,7 +48,7 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 	var data dto.CategoryRequest
 
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(400, gin.H{"status": false, "message": err.Error()})
+		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -57,7 +56,6 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 	err := dataEntity.Validate()
 	if err != nil {
 		c.JSON(400, gin.H{
-			"status":  false,
 			"message": err.Error(),
 		})
 		return
@@ -65,11 +63,11 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 
 	category, createErr := h.categoryApp.Create(&dataEntity)
 	if createErr != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"status": true, "message": "Category created successfully", "data": category})
+	c.JSON(200, gin.H{"message": "Category created successfully", "data": category})
 }
 
 // @Summary Get a category by ID
@@ -82,24 +80,23 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 func (h *CategoryHandler) GetById(c *gin.Context) {
 	paramID := c.Param("id")
 	if paramID == "" {
-		c.JSON(400, gin.H{"status": false, "message": "Category ID is required"})
+		c.JSON(400, gin.H{"message": "Category ID is required"})
 		return
 	}
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid ID format", "status": false})
+		c.JSON(400, gin.H{"message": "Invalid ID format"})
 		return
 	}
 
 	category, err := h.categoryApp.GetByID(id)
 	if err != nil {
-		c.JSON(500, gin.H{"status": false, "message": err.Error()})
+		c.JSON(500, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"status":  true,
 		"message": "Category found",
 		"data":    category,
 	})

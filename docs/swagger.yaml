@@ -1,8 +1,6 @@
 definitions:
   dto.CategoryRequest:
     properties:
-      itemType:
-        type: integer
       name:
         type: string
     type: object
@@ -38,16 +36,9 @@ definitions:
     properties:
       id:
         type: integer
-      itemType:
-        allOf:
-        - $ref: '#/definitions/entity.ItemType'
-        enum:
-        - 1
-        - 2
       name:
         type: string
     required:
-    - itemType
     - name
     type: object
   entity.CategoryPromotionDiscount:

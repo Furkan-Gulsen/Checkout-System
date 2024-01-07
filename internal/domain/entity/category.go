@@ -8,9 +8,8 @@ import (
 )
 
 type Category struct {
-	Id       int      `json:"id" bson:"_id"`
-	Name     string   `json:"name" bson:"name" validate:"required"`
-	ItemType ItemType `json:"itemType" bson:"itemType" validate:"required,oneof=1 2"`
+	Id   int    `json:"id" bson:"_id"`
+	Name string `json:"name" bson:"name" validate:"required"`
 }
 
 func (category Category) Validate() error {
@@ -27,8 +26,6 @@ func (category Category) Validate() error {
 		structField := err.StructField()
 		if tag == "required" {
 			customValidationErrors = append(customValidationErrors, structField+" is required.")
-		} else if tag == "oneof" {
-			customValidationErrors = append(customValidationErrors, structField+" must be 1 or 2.")
 		}
 	}
 

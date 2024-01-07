@@ -545,9 +545,6 @@ const docTemplate = `{
         "dto.CategoryRequest": {
             "type": "object",
             "properties": {
-                "itemType": {
-                    "type": "integer"
-                },
                 "name": {
                     "type": "string"
                 }
@@ -599,23 +596,11 @@ const docTemplate = `{
         "entity.Category": {
             "type": "object",
             "required": [
-                "itemType",
                 "name"
             ],
             "properties": {
                 "id": {
                     "type": "integer"
-                },
-                "itemType": {
-                    "enum": [
-                        1,
-                        2
-                    ],
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/entity.ItemType"
-                        }
-                    ]
                 },
                 "name": {
                     "type": "string"
