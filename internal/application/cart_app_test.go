@@ -1,7 +1,6 @@
 package application
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
@@ -776,6 +775,18 @@ func addVasItem(t *testing.T) {
 		}, nil
 	}
 
+	getByIDItemRepo = func(id int) (*entity.Item, error) {
+		return &entity.Item{
+			Id:         5002,
+			CategoryID: 1004,
+			SellerID:   1111,
+			Price:      100,
+			Quantity:   5,
+			CartID:     cartId,
+			ItemType:   entity.DefaultItem,
+		}, nil
+	}
+
 	getByIDVasItemRepo = func(id int) (*entity.VasItem, error) {
 		return vasItem, nil
 	}
@@ -857,14 +868,20 @@ func displayCart(t *testing.T) {
 
 	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
 	cart, err := app.Display(cartId)
-	fmt.Println("items: ", cart.Items)
+
 	for _, item := range cart.Items {
-		fmt.Println("vasItems: ", item.VasItems)
+		assert.Equal(t, 1, len(item.VasItems))
+		for _, vasItem := range item.VasItems {
+			assert.Equal(t, float64(200), vasItem.Price)
+			assert.Equal(t, 2, vasItem.Quantity)
+		}
 	}
+
 	assert.Nil(t, err)
 	assert.NotNil(t, cart)
 	assert.Equal(t, float64(1400), cart.TotalAmount)
 	assert.Equal(t, float64(1400), cart.TotalPrice)
 	assert.Equal(t, float64(0), cart.TotalDiscount)
 	assert.Equal(t, 0, cart.AppliedPromotionId)
+	assert.Equal(t, 2, len(cart.Items))
 }

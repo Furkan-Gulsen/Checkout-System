@@ -45,7 +45,6 @@ func (app *vasItemApp) Create(vasItem *entity.VasItem) (*entity.VasItem, error) 
 	if getItemErr != nil {
 		return nil, fmt.Errorf("item not found. Item ID: %d", vasItem.ItemId)
 	}
-	fmt.Println("item: ", item.CategoryID)
 
 	// * Check if item category id is 1001 or 3004
 	if item.CategoryID != 1001 && item.CategoryID != 3004 {

@@ -86,7 +86,6 @@ func TestSaveVasItem_Success(t *testing.T) {
 	vasItem, err := app.Create(vasItem)
 	assert.Nil(t, err)
 	assert.Equal(t, 1234, vasItem.Id)
-	fmt.Println("vasItem: ", vasItem)
 	assert.Equal(t, 3242, vasItem.CategoryId)
 	assert.Equal(t, 2222, vasItem.ItemId)
 	assert.Equal(t, 5003, vasItem.SellerId)

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/application"
@@ -70,8 +69,6 @@ func (h *VasItemHandler) GetById(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "Vas Item ID is required"})
 		return
 	}
-
-	fmt.Println("paramID: ", paramID)
 
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
