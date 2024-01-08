@@ -73,6 +73,9 @@ func TestAllForCart(t *testing.T) {
 	t.Run("TestDisplayCart", func(t *testing.T) {
 		displayCart(t)
 	})
+	t.Run("TestAddVasItem", func(t *testing.T) {
+		addVasItem(t)
+	})
 }
 
 // * Test of Adding Items to an Uncreated Cart
@@ -698,6 +701,109 @@ func resetCart(t *testing.T) {
 	assert.Equal(t, float64(0), cart.TotalAmount)
 	assert.Equal(t, float64(0), cart.TotalPrice)
 	assert.Equal(t, float64(0), cart.TotalDiscount)
+}
+
+func addVasItem(t *testing.T) {
+	const cartId = 1505
+
+	getByIDPromotionRepo = func(id int) (*entity.Promotion, error) {
+		return &entity.Promotion{
+			Id:            1236,
+			PromotionType: entity.PromotionType(3),
+			TotalPriceP: []*entity.TotalPricePromotionDiscount{
+				{
+					PriceRangeStart: 1000,
+					PriceRangeEnd:   2000,
+					DiscountAmount:  200,
+				},
+			},
+		}, nil
+	}
+
+	vasItem := &entity.VasItem{
+		Id:         3456,
+		CategoryId: 1001,
+		ItemId:     5002,
+		SellerId:   5003,
+		Price:      200,
+		Quantity:   2,
+	}
+
+	getByIDCartRepo = func(id int) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        1400,
+			TotalPrice:         1400,
+			TotalDiscount:      0,
+			AppliedPromotionId: 1236,
+		}, nil
+	}
+
+	listItemRepo = func(id int) ([]*entity.Item, error) {
+		return []*entity.Item{
+			{
+				Id:         5001,
+				CategoryID: 1001,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+			{
+				Id:         5002,
+				CategoryID: 1004,
+				SellerID:   1111,
+				Price:      100,
+				Quantity:   5,
+				CartID:     cartId,
+				ItemType:   entity.DefaultItem,
+			},
+		}, nil
+	}
+
+	listVasItemRepo = func(itemId int) ([]*entity.VasItem, error) {
+		return []*entity.VasItem{vasItem}, nil
+	}
+
+	updateCartRepo = func(cart *entity.Cart) (*entity.Cart, error) {
+		return &entity.Cart{
+			Id:                 cartId,
+			TotalAmount:        0,
+			TotalPrice:         0,
+			TotalDiscount:      0,
+			AppliedPromotionId: 1236,
+		}, nil
+	}
+
+	getByIDVasItemRepo = func(id int) (*entity.VasItem, error) {
+		return vasItem, nil
+	}
+
+	createVasItemRepo = func(vasItem *entity.VasItem) (*entity.VasItem, error) {
+		return vasItem, nil
+	}
+
+	deleteItemRepo = func(id int) error {
+		return nil
+	}
+
+	deleteVasItemRepo = func(id int) error {
+		return nil
+	}
+
+	deleteCartRepo = func(id int) error {
+		return nil
+	}
+
+	app := NewCartApp(CartAppMock, ItemAppMock, VasItemAppMock, PromotionAppMock)
+	cart, err := app.AddVasItem(vasItem)
+	assert.Nil(t, err)
+	assert.NotNil(t, cart)
+	assert.Equal(t, float64(1600), cart.TotalAmount)
+	assert.Equal(t, float64(1800), cart.TotalPrice)
+	assert.Equal(t, float64(200), cart.TotalDiscount)
+
 }
 
 func displayCart(t *testing.T) {

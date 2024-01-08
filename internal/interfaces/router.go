@@ -50,7 +50,6 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	// * VasItem Routes
 	vasitemRouterGroup := g.Group("/vasitem")
 	vasitemRouterGroup.GET("/list", vasitemHandler.ListByItemId)
-	vasitemRouterGroup.POST("/", vasitemHandler.Create)
 	vasitemRouterGroup.GET("/:id", vasitemHandler.GetById)
 
 	// * Cart Routes

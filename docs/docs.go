@@ -409,43 +409,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/vasitem": {
-            "post": {
-                "description": "Create a new vas item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "VasItem"
-                ],
-                "summary": "Create a vas item",
-                "parameters": [
-                    {
-                        "description": "Vas Item object",
-                        "name": "vas_item",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.VasItem"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.VasItem"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/vasitem/list": {
             "get": {
                 "description": "Get a list of vas items",

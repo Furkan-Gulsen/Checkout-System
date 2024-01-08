@@ -429,30 +429,6 @@ paths:
       summary: List promotions
       tags:
       - Promotion
-  /api/v1/vasitem:
-    post:
-      consumes:
-      - application/json
-      description: Create a new vas item
-      parameters:
-      - description: Vas Item object
-        in: body
-        name: vas_item
-        required: true
-        schema:
-          $ref: '#/definitions/entity.VasItem'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/entity.VasItem'
-            type: array
-      summary: Create a vas item
-      tags:
-      - VasItem
   /api/v1/vasitem/{id}:
     delete:
       description: Delete a vas item

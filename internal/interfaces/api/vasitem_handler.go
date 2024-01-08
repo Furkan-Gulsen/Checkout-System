@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/application"
-	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/gin-gonic/gin"
 )
 
@@ -93,34 +92,6 @@ func (h *VasItemHandler) GetById(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"message": "Vas item found",
-		"data":    vasItem,
-	})
-}
-
-// @Summary Create a vas item
-// @Description Create a new vas item
-// @Tags VasItem
-// @Accept json
-// @Produce json
-// @Param vas_item body entity.VasItem true "Vas Item object"
-// @Success 200 {object} []entity.VasItem
-// @Router /api/v1/vasitem [post]
-func (h *VasItemHandler) Create(c *gin.Context) {
-	var vasItem *entity.VasItem
-
-	if err := c.ShouldBindJSON(&vasItem); err != nil {
-		c.JSON(400, gin.H{"message": err.Error()})
-		return
-	}
-
-	vasItem, createErr := h.vasItemApp.Create(vasItem)
-	if createErr != nil {
-		c.JSON(500, gin.H{"message": createErr.Error()})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"message": "Vas Item created successfully",
 		"data":    vasItem,
 	})
 }
