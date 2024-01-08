@@ -15,6 +15,70 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/cart/item/{itemId}": {
+            "delete": {
+                "description": "Remove an item from a cart",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Remove Item from cart",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Item ID",
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item removed successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cart/vas-item/{vasItemId}": {
+            "delete": {
+                "description": "Remove a vas item from a cart",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Remove vas item from cart",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Vas Item ID",
+                        "name": "vasItemId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vas item removed successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/cart/{cartId}": {
             "get": {
                 "description": "Display a cart",
@@ -118,6 +182,33 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/cart/{cartId}/item/{itemId}/vas-item/{vasItemId}": {
+            "post": {
+                "description": "Add a vas item to a cart",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add vas item",
+                "parameters": [
+                    {
+                        "description": "VasItem",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.VasItemCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/cart/{cartId}/promotion/{promotionId}": {
             "post": {
                 "description": "Apply a promotion to a cart",
@@ -150,6 +241,12 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Promotion applied successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "Promotion already applied",
                         "schema": {
                             "type": "string"
                         }
@@ -473,34 +570,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Delete a vas item",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "VasItem"
-                ],
-                "summary": "Delete a vas item",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int",
-                        "description": "Vas Item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Vas Item deleted successfully",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
             }
         }
     },
@@ -516,9 +585,6 @@ const docTemplate = `{
         "dto.ItemCreateRequest": {
             "type": "object",
             "properties": {
-                "cartId": {
-                    "type": "integer"
-                },
                 "categoryId": {
                     "type": "integer"
                 },
@@ -553,6 +619,26 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entity.TotalPricePromotionDiscount"
                     }
+                }
+            }
+        },
+        "dto.VasItemCreateRequest": {
+            "type": "object",
+            "properties": {
+                "categoryId": {
+                    "type": "integer"
+                },
+                "itemId": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "sellerId": {
+                    "type": "integer"
                 }
             }
         },

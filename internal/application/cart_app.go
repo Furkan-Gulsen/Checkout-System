@@ -36,6 +36,8 @@ type CartAppInterface interface {
 	AddItem(cartId int, item *entity.Item) (*entity.Cart, error)
 	UpdateCartPriceAndQuantity(cart *entity.Cart) (*entity.Cart, error)
 	AddVasItem(vasItem *entity.VasItem) (*entity.Cart, error)
+	RemoveItem(itemId int) (*entity.Cart, error)
+	RemoveVasItem(vasItemId int) (*entity.Cart, error)
 }
 
 func (app *cartApp) ApplyPromotion(cartId int, promotionId int) (*entity.Cart, error) {
@@ -156,11 +158,6 @@ func (app *cartApp) ResetCart(cartId int) (*entity.Cart, error) {
 		return nil, fmt.Errorf("failed to reset cart: %v", err)
 	}
 
-	err = app.cartRepo.Delete(cartId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to reset cart: %v", err)
-	}
-
 	items, err := app.itemApp.ListByCartId(cartId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to reset cart: %v", err)
@@ -202,7 +199,7 @@ func (app *cartApp) AddItem(cartId int, item *entity.Item) (*entity.Cart, error)
 			return nil, fmt.Errorf("failed create cart error: %v", err)
 		}
 	}
-	item.CartID = cartId
+	item.CartID = cart.Id
 
 	itemValidateErr := item.Validate()
 	if itemValidateErr != nil {
@@ -280,15 +277,74 @@ func (app *cartApp) AddVasItem(vasItem *entity.VasItem) (*entity.Cart, error) {
 		return nil, fmt.Errorf("failed to add vas item: %v", err)
 	}
 
-	cart, err := app.cartRepo.GetByID(vasItem.ItemId)
+	item, err := app.itemApp.GetById(vasItem.ItemId)
+	if err != nil {
+		app.vasItemApp.DeleteById(item.Id) // * Rollback
+		return nil, fmt.Errorf("item not found. ItemID: %d", vasItem.ItemId)
+	}
+
+	cart, err := app.cartRepo.GetByID(item.CartID)
 	if err != nil {
 		app.vasItemApp.DeleteById(vasItem.Id) // * Rollback
-		return nil, fmt.Errorf("cart not found. CartID: %d", vasItem.ItemId)
+		return nil, fmt.Errorf("cart not found. CartID: %d", item.CartID)
 	}
 
 	cart, err = app.UpdateCartPriceAndQuantity(cart)
 	if err != nil {
 		app.vasItemApp.DeleteById(vasItem.Id) // * Rollback
+		return nil, fmt.Errorf("failed to update cart price and quantity. Error: %v", err)
+	}
+
+	return cart, nil
+}
+
+func (app *cartApp) RemoveItem(itemId int) (*entity.Cart, error) {
+
+	item, err := app.itemApp.GetById(itemId)
+	if err != nil {
+		return nil, fmt.Errorf("item not found. ItemID: %d", itemId)
+	}
+
+	cart, err := app.cartRepo.GetByID(item.CartID)
+	if err != nil {
+		return nil, fmt.Errorf("cart not found. CartID: %d", item.CartID)
+	}
+
+	app.itemApp.Delete(itemId)
+	vasItems, _ := app.vasItemApp.ListByItemId(item.Id)
+	for _, vasItem := range vasItems {
+		app.vasItemApp.DeleteById(vasItem.Id)
+	}
+
+	cart, err = app.UpdateCartPriceAndQuantity(cart)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update cart price and quantity. Error: %v", err)
+	}
+
+	return cart, nil
+}
+
+func (app *cartApp) RemoveVasItem(vasItemId int) (*entity.Cart, error) {
+
+	vasItem, err := app.vasItemApp.GetById(vasItemId)
+	if err != nil {
+		return nil, fmt.Errorf("vas item not found. VasItemID: %d", vasItemId)
+	}
+
+	item, err := app.itemApp.GetById(vasItem.ItemId)
+	if err != nil {
+		return nil, fmt.Errorf("item not found. ItemID: %d", vasItem.ItemId)
+	}
+
+	cart, err := app.cartRepo.GetByID(item.CartID)
+	if err != nil {
+		return nil, fmt.Errorf("cart not found. CartID: %d", item.CartID)
+	}
+
+	app.vasItemApp.DeleteById(vasItemId)
+
+	cart, err = app.UpdateCartPriceAndQuantity(cart)
+	if err != nil {
 		return nil, fmt.Errorf("failed to update cart price and quantity. Error: %v", err)
 	}
 

@@ -6,8 +6,6 @@ definitions:
     type: object
   dto.ItemCreateRequest:
     properties:
-      cartId:
-        type: integer
       categoryId:
         type: integer
       itemType:
@@ -31,6 +29,19 @@ definitions:
         items:
           $ref: '#/definitions/entity.TotalPricePromotionDiscount'
         type: array
+    type: object
+  dto.VasItemCreateRequest:
+    properties:
+      categoryId:
+        type: integer
+      itemId:
+        type: integer
+      price:
+        type: number
+      quantity:
+        type: integer
+      sellerId:
+        type: integer
     type: object
   entity.Category:
     properties:
@@ -237,6 +248,24 @@ paths:
       summary: Add item
       tags:
       - Cart
+  /api/v1/cart/{cartId}/item/{itemId}/vas-item/{vasItemId}:
+    post:
+      consumes:
+      - application/json
+      description: Add a vas item to a cart
+      parameters:
+      - description: VasItem
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VasItemCreateRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Add vas item
+      tags:
+      - Cart
   /api/v1/cart/{cartId}/promotion/{promotionId}:
     post:
       consumes:
@@ -260,7 +289,53 @@ paths:
           description: Promotion applied successfully
           schema:
             type: string
+        "409":
+          description: Promotion already applied
+          schema:
+            type: string
       summary: Apply promotion
+      tags:
+      - Cart
+  /api/v1/cart/item/{itemId}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an item from a cart
+      parameters:
+      - description: Item ID
+        in: path
+        name: itemId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item removed successfully
+          schema:
+            type: string
+      summary: Remove Item from cart
+      tags:
+      - Cart
+  /api/v1/cart/vas-item/{vasItemId}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a vas item from a cart
+      parameters:
+      - description: Vas Item ID
+        in: path
+        name: vasItemId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vas item removed successfully
+          schema:
+            type: string
+      summary: Remove vas item from cart
       tags:
       - Cart
   /api/v1/category:
@@ -430,25 +505,6 @@ paths:
       tags:
       - Promotion
   /api/v1/vasitem/{id}:
-    delete:
-      description: Delete a vas item
-      parameters:
-      - description: Vas Item ID
-        format: int
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Vas Item deleted successfully
-          schema:
-            type: string
-      summary: Delete a vas item
-      tags:
-      - VasItem
     get:
       description: Get a vas item
       parameters:

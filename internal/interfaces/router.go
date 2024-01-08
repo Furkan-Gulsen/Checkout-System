@@ -58,4 +58,7 @@ func RegisterRoutes(g *gin.RouterGroup, cfg *config.Config) {
 	cartRouterGroup.GET("/:cartId", cartHandler.Display)
 	cartRouterGroup.DELETE("/:cartId", cartHandler.ResetCart)
 	cartRouterGroup.POST("/:cartId/item", cartHandler.AddItem)
+	cartRouterGroup.POST("/:cartId/item/:itemId/vas-item/:vasItemId", cartHandler.AddVasItem)
+	cartRouterGroup.DELETE("/item/:itemId", cartHandler.RemoveItem)
+	cartRouterGroup.DELETE("/vas-item/:vasItemId", cartHandler.RemoveVasItem)
 }

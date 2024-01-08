@@ -95,33 +95,3 @@ func (h *VasItemHandler) GetById(c *gin.Context) {
 		"data":    vasItem,
 	})
 }
-
-// @Summary Delete a vas item
-// @Description Delete a vas item
-// @Tags VasItem
-// @Produce json
-// @Param id path int true "Vas Item ID" Format(int)
-// @Success 200 {string} string "Vas Item deleted successfully"
-// @Router /api/v1/vasitem/{id} [delete]
-func (h *VasItemHandler) Delete(c *gin.Context) {
-	paramID := c.Param("id")
-	if paramID == "" {
-		c.JSON(400, gin.H{"message": "Vas Item ID is required"})
-		return
-	}
-
-	id, err := strconv.Atoi(paramID)
-	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid ID format"})
-		return
-	}
-
-	if err := h.vasItemApp.DeleteById(id); err != nil {
-		c.JSON(500, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"message": "Vas Item deleted successfully",
-	})
-}
