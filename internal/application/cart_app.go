@@ -7,8 +7,8 @@ import (
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/repository"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/utils"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/dto"
-	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 )
 
 var _ CartAppInterface = &cartApp{}

@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/Furkan-Gulsen/Checkout-System/config"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/utils"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces"
 	"github.com/Furkan-Gulsen/Checkout-System/internal/interfaces/middleware"
 	"github.com/Furkan-Gulsen/Checkout-System/pkg/logger"
-	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/Furkan-Gulsen/Checkout-System/internal/domain/entity"
+	"github.com/Furkan-Gulsen/Checkout-System/internal/infrastructure/utils"
 	"github.com/Furkan-Gulsen/Checkout-System/pkg/constants"
-	"github.com/Furkan-Gulsen/Checkout-System/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
