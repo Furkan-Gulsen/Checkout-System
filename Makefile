@@ -1,4 +1,4 @@
-APP=TY_Case
+APP=checkout_app
 
 ### General
 
